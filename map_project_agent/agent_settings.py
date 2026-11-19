@@ -7,10 +7,16 @@ HubClient/StreamsPublisher/GeminiClient 구성과 잡 타임아웃에 사용한�
 """
 from __future__ import annotations
 
-from typing import Literal
+import os
+from typing import Any, Literal
 
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import dotenv_values
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 
 class AgentSettings(BaseSettings):
@@ -214,13 +220,34 @@ class AgentSettings(BaseSettings):
     # 읽는 값은 MAP_PROJECT_ + 필드 이름(validation_alias), DB 로그인은
     # AGENT_DATABASE_USER·AGENT_DATABASE_PASSWORD. 코드 안에서는 접두 없는
     # 필드 이름을 그대로 쓴다(populate_by_name).
+    # 빈 값은 설정하지 않은 것으로 본다(env_ignore_empty). compose 가 비어 있는
+    # 변수를 빈 문자열로 넘겨도 불리언·숫자 설정이 부팅을 깨지 않고 기본값을
+    # 쓴다. 빈 값 자체가 뜻을 가지는 필드는 _KEEP_EMPTY 에만 두고 따로 읽는다.
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         env_prefix="AGENT_",
+        env_ignore_empty=True,
         extra="ignore",
         populate_by_name=True,
     )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            _KeepEmptySource(settings_cls, getattr(dotenv_settings, "env_file", None)),
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
     LLM_PROVIDER: Literal["fake", "gemini"] = "fake"
     GEMINI_API_KEY: SecretStr = Field(SecretStr(""), validation_alias="MAP_PROJECT_GEMINI_API_KEY")
@@ -327,6 +354,41 @@ class AgentSettings(BaseSettings):
     LANGSMITH_API_KEY: SecretStr = SecretStr("")
     LANGSMITH_PROJECT: str = ""
     LANGSMITH_ENDPOINT: str = ""
+
+
+# 빈 값이 "끔" 을 뜻하는 필드(환경 변수 이름 → 필드 이름). 여기에만 명시적
+# 빈 값을 그대로 넘기고, 나머지 빈 값은 설정하지 않은 것으로 본다.
+#   AGENT_GEMINI_RETRY_STATUS_CODES= → 재시도 대상 코드 없음(재시도 끔).
+_KEEP_EMPTY = {"AGENT_GEMINI_RETRY_STATUS_CODES": "GEMINI_RETRY_STATUS_CODES"}
+
+
+class _KeepEmptySource(PydanticBaseSettingsSource):
+    """_KEEP_EMPTY 의 필드가 환경 변수나 .env 에 빈 값으로 적혀 있으면 빈 값을 준다."""
+
+    def __init__(self, settings_cls: type[BaseSettings], env_file: Any) -> None:
+        super().__init__(settings_cls)
+        # 실제로 읽는 .env 경로(_env_file 로 바꾼 값 포함). 여러 개면 뒤가 이긴다.
+        if env_file is None:
+            self._env_files: list = []
+        elif isinstance(env_file, (list, tuple)):
+            self._env_files = list(env_file)
+        else:
+            self._env_files = [env_file]
+
+    def get_field_value(self, field: Any, field_name: str) -> tuple[Any, str, bool]:
+        return None, field_name, False
+
+    def __call__(self) -> dict[str, Any]:
+        file_values: dict[str, Any] = {}
+        for path in self._env_files:
+            if path and os.path.exists(path):
+                file_values.update(dotenv_values(path))
+        out: dict[str, Any] = {}
+        for env_name, field in _KEEP_EMPTY.items():
+            raw = os.environ.get(env_name, file_values.get(env_name))
+            if raw is not None and raw.strip() == "":
+                out[field] = ""
+        return out
 
 
 # _settings

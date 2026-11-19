@@ -125,3 +125,32 @@ def test_langsmith_is_passed_to_sdk_names_and_off_by_default(monkeypatch) -> Non
     _export_langsmith_env(AgentSettings(_env_file=None))
     assert os.environ["LANGSMITH_TRACING"] == "true"
     assert os.environ["LANGSMITH_PROJECT"] == "my-project"
+
+
+def test_empty_values_fall_back_to_defaults(monkeypatch) -> None:
+    """compose 가 빈 값을 넘겨도 불리언·숫자·선택값 설정은 기본값을 쓴다."""
+    for name in ("AGENT_RULES_ENABLED", "AGENT_REVIEWS_MAX_PLACES", "MAP_PROJECT_REDIS_DB_STREAMS",
+                 "AGENT_LLM_PROVIDER", "AGENT_CHECKPOINT_ENABLED", "MAP_PROJECT_HUB_BASE_URL"):
+        monkeypatch.setenv(name, "")
+    s = AgentSettings(_env_file=None)
+    assert s.RULES_ENABLED is True
+    assert s.REVIEWS_MAX_PLACES == 3
+    assert s.REDIS_DB_STREAMS == 2
+    assert s.LLM_PROVIDER == "fake"
+    assert s.CHECKPOINT_ENABLED is True
+    assert s.HUB_BASE_URL == "http://hub:8000"
+
+
+def test_empty_retry_codes_still_mean_off(monkeypatch, tmp_path) -> None:
+    """재시도 대상 코드만은 빈 값이 '끔' 이다(환경 변수·.env 모두)."""
+    assert AgentSettings(_env_file=None).GEMINI_RETRY_STATUS_CODES == "503,500"
+
+    monkeypatch.setenv("AGENT_GEMINI_RETRY_STATUS_CODES", "")
+    assert AgentSettings(_env_file=None).GEMINI_RETRY_STATUS_CODES == ""
+    monkeypatch.delenv("AGENT_GEMINI_RETRY_STATUS_CODES")
+
+    env_file = tmp_path / "agent.env"
+    env_file.write_text("AGENT_GEMINI_RETRY_STATUS_CODES=\nAGENT_RULES_ENABLED=\n", encoding="utf-8")
+    s = AgentSettings(_env_file=env_file)
+    assert s.GEMINI_RETRY_STATUS_CODES == ""
+    assert s.RULES_ENABLED is True
