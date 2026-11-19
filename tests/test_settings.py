@@ -55,20 +55,20 @@ def test_defaults() -> None:
 
 def test_env_injection(monkeypatch) -> None:
     """환경 변수 주입 시 각 필드가 실제로 로드되는지 확인."""
-    monkeypatch.setenv("GEMINI_RPM_LIMIT", "5")
-    monkeypatch.setenv("GEMINI_RPD_CAP", "100")
-    monkeypatch.setenv("GEMINI_MAX_CALLS_PER_REQUEST", "2")
-    monkeypatch.setenv("GEMINI_TEMPERATURE", "0.0")
-    monkeypatch.setenv("GEMINI_MAX_OUTPUT_TOKENS", "1024")
-    monkeypatch.setenv("REDIS_DB_RATELIMIT", "5")
-    monkeypatch.setenv("STATUS_STREAM_NAME", "agent:jobs:status-test")
-    monkeypatch.setenv("CHECKPOINT_ENABLED", "false")
-    monkeypatch.setenv("POSTGRES_PASSWORD", "pw-test")
-    monkeypatch.setenv("JOB_TIMEOUT_SECONDS", "120")
-    monkeypatch.setenv("AUTH_ENFORCED", "true")
-    monkeypatch.setenv("REVIEWS_ENRICH_ENABLED", "false")
-    monkeypatch.setenv("REVIEWS_MAX_PLACES", "5")
-    monkeypatch.setenv("RULES_ENABLED", "false")
+    monkeypatch.setenv("AGENT_GEMINI_RPM_LIMIT", "5")
+    monkeypatch.setenv("MAP_PROJECT_GEMINI_RPD_CAP", "100")
+    monkeypatch.setenv("AGENT_GEMINI_MAX_CALLS_PER_REQUEST", "2")
+    monkeypatch.setenv("AGENT_GEMINI_TEMPERATURE", "0.0")
+    monkeypatch.setenv("AGENT_GEMINI_MAX_OUTPUT_TOKENS", "1024")
+    monkeypatch.setenv("MAP_PROJECT_REDIS_DB_RATELIMIT", "5")
+    monkeypatch.setenv("AGENT_STATUS_STREAM_NAME", "agent:jobs:status-test")
+    monkeypatch.setenv("AGENT_CHECKPOINT_ENABLED", "false")
+    monkeypatch.setenv("AGENT_DATABASE_PASSWORD", "pw-test")
+    monkeypatch.setenv("AGENT_JOB_TIMEOUT_SECONDS", "120")
+    monkeypatch.setenv("AGENT_AUTH_ENFORCED", "true")
+    monkeypatch.setenv("AGENT_REVIEWS_ENRICH_ENABLED", "false")
+    monkeypatch.setenv("AGENT_REVIEWS_MAX_PLACES", "5")
+    monkeypatch.setenv("AGENT_RULES_ENABLED", "false")
     s = AgentSettings(_env_file=None)
     assert s.GEMINI_RPM_LIMIT == 5
     assert s.GEMINI_RPD_CAP == 100
@@ -84,3 +84,44 @@ def test_env_injection(monkeypatch) -> None:
     assert s.REVIEWS_ENRICH_ENABLED is False
     assert s.REVIEWS_MAX_PLACES == 5
     assert s.RULES_ENABLED is False
+
+
+def test_old_unprefixed_names_are_ignored(monkeypatch) -> None:
+    """접두 없는 옛 이름은 읽지 않는다 — 새 이름만 설정이 된다."""
+    monkeypatch.setenv("STATUS_STREAM_NAME", "old-name")
+    monkeypatch.setenv("POSTGRES_USER", "operator")
+    s = AgentSettings(_env_file=None)
+    assert s.STATUS_STREAM_NAME == "agent:jobs:status"
+    assert s.POSTGRES_USER == "map_agent_runtime"
+
+
+def test_shared_values_use_the_common_prefix(monkeypatch) -> None:
+    """다른 서비스와 같이 읽는 값은 MAP_PROJECT_ 접두, DB 로그인은 AGENT_DATABASE_*."""
+    monkeypatch.setenv("MAP_PROJECT_LOCATION_WIRE_KEY", "k")
+    monkeypatch.setenv("MAP_PROJECT_HUB_BASE_URL", "http://hub.test")
+    monkeypatch.setenv("AGENT_DATABASE_USER", "runtime-test")
+    monkeypatch.setenv("AGENT_LLM_PROVIDER", "gemini")
+    s = AgentSettings(_env_file=None)
+    assert s.LOCATION_WIRE_KEY.get_secret_value() == "k"
+    assert s.HUB_BASE_URL == "http://hub.test"
+    assert s.POSTGRES_USER == "runtime-test"
+    assert s.LLM_PROVIDER == "gemini"
+
+
+def test_langsmith_is_passed_to_sdk_names_and_off_by_default(monkeypatch) -> None:
+    """SDK 가 읽는 LANGSMITH_* 는 AGENT_LANGSMITH_* 에서 온다. 기본은 꺼짐."""
+    from map_project_agent.main import _export_langsmith_env
+
+    # 끝나면 네 이름을 원래 상태로 되돌리도록 먼저 기록해 둔다.
+    for name in ("LANGSMITH_API_KEY", "LANGSMITH_PROJECT", "LANGSMITH_ENDPOINT"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")  # 바깥에 남은 값
+    _export_langsmith_env(AgentSettings(_env_file=None))
+    import os
+    assert os.environ["LANGSMITH_TRACING"] == "false"
+
+    monkeypatch.setenv("AGENT_LANGSMITH_TRACING", "true")
+    monkeypatch.setenv("AGENT_LANGSMITH_PROJECT", "my-project")
+    _export_langsmith_env(AgentSettings(_env_file=None))
+    assert os.environ["LANGSMITH_TRACING"] == "true"
+    assert os.environ["LANGSMITH_PROJECT"] == "my-project"

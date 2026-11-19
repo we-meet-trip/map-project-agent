@@ -47,11 +47,11 @@ async def migrate(dsn: str, schema: str) -> None:
 
 def main() -> int:
     dsn = os.environ.get("AGENT_CHECKPOINT_MIGRATION_DSN", "")
-    if not dsn or os.environ.get("POSTGRES_PASSWORD"):
+    if not dsn or os.environ.get("AGENT_DATABASE_PASSWORD"):
         print("Agent migration requires its dedicated DSN and no runtime password", file=sys.stderr)
         return 1
     try:
-        asyncio.run(migrate(dsn, os.environ.get("LANGGRAPH_SCHEMA", "langgraph")))
+        asyncio.run(migrate(dsn, os.environ.get("AGENT_LANGGRAPH_SCHEMA", "langgraph")))
     except Exception as error:
         import re
         state = getattr(error, "sqlstate", None)

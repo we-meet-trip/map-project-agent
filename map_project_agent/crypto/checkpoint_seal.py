@@ -94,7 +94,7 @@ def build_cipher(settings: AgentSettings) -> CheckpointCipher:
     """설정에서 열쇠를 읽어 cipher 를 만든다. 잘못돼 있으면 예외로 부팅을 막는다."""
     raw = settings.CHECKPOINT_ENC_KEYS.get_secret_value()
     if not raw:
-        raise CheckpointSealError("CHECKPOINT_ENC_KEYS not configured")
+        raise CheckpointSealError("AGENT_CHECKPOINT_ENC_KEYS not configured")
     keys = parse_keys(raw)
     # 좌표 전송 열쇠를 그대로 돌려쓰는 것은 거부한다. 하나가 새면 전송로와
     # 저장소가 한꺼번에 열리므로 용도마다 다른 열쇠를 강제한다.
@@ -106,6 +106,6 @@ def build_cipher(settings: AgentSettings) -> CheckpointCipher:
             wire_key = None
         if wire_key in keys.values():
             raise CheckpointSealError(
-                "checkpoint keys must differ from LOCATION_WIRE_KEY"
+                "checkpoint keys must differ from MAP_PROJECT_LOCATION_WIRE_KEY"
             )
     return CheckpointCipher(keys, settings.CHECKPOINT_ENC_ACTIVE_KID)

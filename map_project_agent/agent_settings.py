@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -210,16 +210,24 @@ class AgentSettings(BaseSettings):
                  때만 stdout 핸들러를 붙여 `map_project_agent.*` 로그를 살린다.
     """
 
+    # 환경 변수 이름: agent 만 읽는 값은 AGENT_ + 필드 이름, 다른 서비스와 같이
+    # 읽는 값은 MAP_PROJECT_ + 필드 이름(validation_alias), DB 로그인은
+    # AGENT_DATABASE_USER·AGENT_DATABASE_PASSWORD. 코드 안에서는 접두 없는
+    # 필드 이름을 그대로 쓴다(populate_by_name).
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_prefix="AGENT_",
+        extra="ignore",
+        populate_by_name=True,
     )
 
     LLM_PROVIDER: Literal["fake", "gemini"] = "fake"
-    GEMINI_API_KEY: SecretStr = SecretStr("")
-    GEMINI_MODEL: str = "gemini-3.8-flash"
+    GEMINI_API_KEY: SecretStr = Field(SecretStr(""), validation_alias="MAP_PROJECT_GEMINI_API_KEY")
+    GEMINI_MODEL: str = Field("gemini-3.8-flash", validation_alias="MAP_PROJECT_GEMINI_MODEL")
     GEMINI_RPM_LIMIT: int = 10
     GEMINI_RPD_LIMIT: int = 250
-    GEMINI_RPD_CAP: int = 200
+    GEMINI_RPD_CAP: int = Field(200, validation_alias="MAP_PROJECT_GEMINI_RPD_CAP")
     GEMINI_MAX_CALLS_PER_REQUEST: int = 3
     GEMINI_TEMPERATURE: float = 0.2
     GEMINI_MAX_OUTPUT_TOKENS: int = 8192
@@ -230,14 +238,14 @@ class AgentSettings(BaseSettings):
     GEMINI_RETRY_STATUS_CODES: str = "503,500"
     GEMINI_HTTP_TIMEOUT_SECONDS: float = 30.0
 
-    HUB_BASE_URL: str = "http://hub:8000"
+    HUB_BASE_URL: str = Field("http://hub:8000", validation_alias="MAP_PROJECT_HUB_BASE_URL")
     HUB_TIMEOUT_SECONDS: float = 5.0
-    INTERNAL_SERVICE_TOKEN: SecretStr | None = None
+    INTERNAL_SERVICE_TOKEN: SecretStr | None = Field(None, validation_alias="MAP_PROJECT_INTERNAL_SERVICE_TOKEN")
 
     # 서비스 사이로 오가는 좌표를 감싸는 열쇠. hub·BFF 와 같은 값을 나눠 가진다.
     # 필수다 — 비어 있거나 형식이 틀리면 부팅을 멈춘다(평문으로 보내는 길은 없다).
     # 32바이트로 풀리는 base64 여야 한다: openssl rand -base64 32
-    LOCATION_WIRE_KEY: SecretStr = SecretStr("")
+    LOCATION_WIRE_KEY: SecretStr = Field(SecretStr(""), validation_alias="MAP_PROJECT_LOCATION_WIRE_KEY")
     AUTH_ENFORCED: bool = False
 
     REVIEWS_ENRICH_ENABLED: bool = False
@@ -267,7 +275,7 @@ class AgentSettings(BaseSettings):
     PERSONALIZATION_ENABLED: bool = True
 
     # 학습 HOLD: 완료 결과와 운영 사용량은 유지하되 학습 전용 신호는 만들지 않는다.
-    TRAINING_CAPTURE_ENABLED: bool = False
+    TRAINING_CAPTURE_ENABLED: bool = Field(False, validation_alias="MAP_PROJECT_TRAINING_CAPTURE_ENABLED")
 
     # 세어 둔 성향별 저장 비율을 랭킹에 얹을지. 파일 경로가 비어 있거나
     # 파일이 없으면 켜져 있어도 아무 일도 하지 않는다.
@@ -283,20 +291,20 @@ class AgentSettings(BaseSettings):
     # 빈틈없이 붙어 실제로 지킬 수 없는 시간표가 된다.
     TIMELINE_BUFFER_MINUTES: int = 10
 
-    REDIS_URL: str = "redis://redis:6379"
-    REDIS_DB_STREAMS: int = 2
-    REDIS_DB_RATELIMIT: int = 3
-    STREAM_NAME: str = "agent:jobs:done"
-    STREAM_MAXLEN: int = 2000
+    REDIS_URL: str = Field("redis://redis:6379", validation_alias="MAP_PROJECT_REDIS_URL")
+    REDIS_DB_STREAMS: int = Field(2, validation_alias="MAP_PROJECT_REDIS_DB_STREAMS")
+    REDIS_DB_RATELIMIT: int = Field(3, validation_alias="MAP_PROJECT_REDIS_DB_RATELIMIT")
+    STREAM_NAME: str = Field("agent:jobs:done", validation_alias="MAP_PROJECT_STREAM_NAME")
+    STREAM_MAXLEN: int = Field(2000, validation_alias="MAP_PROJECT_STREAM_MAXLEN")
     STATUS_STREAM_NAME: str = "agent:jobs:status"
     STATUS_STREAM_MAXLEN: int = 2000
 
     CHECKPOINT_ENABLED: bool = True
-    POSTGRES_HOST: str = "postgres"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "map"
-    POSTGRES_USER: str = "map_agent_runtime"
-    POSTGRES_PASSWORD: SecretStr = SecretStr("")
+    POSTGRES_HOST: str = Field("postgres", validation_alias="MAP_PROJECT_POSTGRES_HOST")
+    POSTGRES_PORT: int = Field(5432, validation_alias="MAP_PROJECT_POSTGRES_PORT")
+    POSTGRES_DB: str = Field("map", validation_alias="MAP_PROJECT_POSTGRES_DB")
+    POSTGRES_USER: str = Field("map_agent_runtime", validation_alias="AGENT_DATABASE_USER")
+    POSTGRES_PASSWORD: SecretStr = Field(SecretStr(""), validation_alias="AGENT_DATABASE_PASSWORD")
     LANGGRAPH_SCHEMA: str = "langgraph"
     # 체크포인트 봉인 열쇠. "kid:base64" 를 쉼표로 이어 여러 개를 두고
     # ACTIVE_KID 의 열쇠로 새로 봉한다. 나머지는 옛 기록을 여는 데만 남는다
@@ -311,6 +319,14 @@ class AgentSettings(BaseSettings):
     SHUTDOWN_GRACE_SECONDS: float = 310.0
 
     LOG_LEVEL: str = "INFO"
+
+    # LangSmith 실행 기록(AGENT_LANGSMITH_*). SDK 는 접두 없는 LANGSMITH_* 를
+    # 읽으므로 lifespan 이 시작할 때 이 값으로 그 이름들을 명시해 넘긴다.
+    # 기본은 꺼짐 — 켜면 LangGraph 실행 기록이 LangSmith 로 간다.
+    LANGSMITH_TRACING: bool = False
+    LANGSMITH_API_KEY: SecretStr = SecretStr("")
+    LANGSMITH_PROJECT: str = ""
+    LANGSMITH_ENDPOINT: str = ""
 
 
 # _settings

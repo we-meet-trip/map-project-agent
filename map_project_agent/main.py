@@ -28,6 +28,7 @@ from __future__ import annotations
 import asyncio
 import hmac
 import logging
+import os
 import sys
 import uuid
 from contextlib import asynccontextmanager
@@ -109,6 +110,25 @@ def _configure_logging(level: str) -> None:
     )
 
 
+def _export_langsmith_env(settings) -> None:
+    """LangSmith SDK 가 읽는 LANGSMITH_* 를 AGENT_LANGSMITH_* 값으로 명시한다.
+
+    SDK 는 접두 없는 이름을 직접 읽는다. 설정의 값을 그 이름으로 넘겨, 기본값
+    (꺼짐)이 바깥 환경에 남은 다른 값에 덮이지 않게 한다. 켜지 않으면 실행
+    기록을 어디에도 보내지 않는다.
+    """
+    os.environ["LANGSMITH_TRACING"] = "true" if settings.LANGSMITH_TRACING else "false"
+    for name, value in (
+        ("LANGSMITH_API_KEY", settings.LANGSMITH_API_KEY.get_secret_value()),
+        ("LANGSMITH_PROJECT", settings.LANGSMITH_PROJECT),
+        ("LANGSMITH_ENDPOINT", settings.LANGSMITH_ENDPOINT),
+    ):
+        if value:
+            os.environ[name] = value
+        else:
+            os.environ.pop(name, None)
+
+
 def _gemini_clients(settings) -> tuple[GeminiClient, GeminiRateLimiter]:
     """Gemini 제공자와 그 호출 한도기를 만든다(제공자가 gemini 일 때만).
 
@@ -153,7 +173,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
       - `INTERNAL_SERVICE_TOKEN` 이 설정되어 있으면 그 SecretStr 평문 값을
         HubClient 의 `X-Internal-Token` 헤더로 전달한다(없으면 None).
       - `AUTH_ENFORCED=true` 인데 토큰이 비어 있으면
-        `RuntimeError("AUTH_ENFORCED=true requires INTERNAL_SERVICE_TOKEN")`
+        `RuntimeError("AGENT_AUTH_ENFORCED=true requires MAP_PROJECT_INTERNAL_SERVICE_TOKEN")`
         로 부팅 중단(fail-fast). false(기본)면 토큰 미설정을 허용한다.
       - HubClient, StreamsPublisher, LLM 클라이언트(fake 또는 Gemini)를 만들어 모듈 전역 슬롯
         (`set_hub_client` / `set_streams_publisher` / `set_gemini_client`) 에
@@ -173,15 +193,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # 로깅은 다른 어떤 초기화보다 먼저 — 아래 fail-fast 게이트가 걸릴 때도
     # 원인이 stdout 에 남아야 한다.
     _configure_logging(settings.LOG_LEVEL)
+    _export_langsmith_env(settings)
     if settings.LLM_PROVIDER == "gemini" and not settings.GEMINI_API_KEY.get_secret_value():
-        raise RuntimeError("LLM_PROVIDER=gemini requires GEMINI_API_KEY")
+        raise RuntimeError("AGENT_LLM_PROVIDER=gemini requires MAP_PROJECT_GEMINI_API_KEY")
     # 서비스 사이 좌표는 늘 봉투로만 오간다. 열쇠가 없거나 형식이 틀리면
     # 첫 요청에서 실패하기 전에 여기서 멈춘다.
     try:
         location_seal.check_key()
     except location_seal.SealError as e:
         raise RuntimeError(
-            f"LOCATION_WIRE_KEY is invalid ({e}); generate one with: "
+            f"MAP_PROJECT_LOCATION_WIRE_KEY is invalid ({e}); generate one with: "
             "openssl rand -base64 32 (hub·BFF 와 같은 값)"
         ) from None
 
@@ -198,7 +219,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # 생략하는 기존 동작을 유지한다.
     if settings.AUTH_ENFORCED and not token:
         raise RuntimeError(
-            "AUTH_ENFORCED=true requires INTERNAL_SERVICE_TOKEN"
+            "AGENT_AUTH_ENFORCED=true requires MAP_PROJECT_INTERNAL_SERVICE_TOKEN"
         )
     hub_client = HubClient(
         base_url=settings.HUB_BASE_URL,
@@ -392,7 +413,7 @@ def _verify_internal_token(provided: str | None) -> None:
     )
     if not expected:
         logger.warning(
-            "INTERNAL_SERVICE_TOKEN not set - /v1/recommend accepts "
+            "MAP_PROJECT_INTERNAL_SERVICE_TOKEN not set - /v1/recommend accepts "
             "unauthenticated requests"
         )
         return

@@ -154,7 +154,7 @@ def main() -> int:
     ap.add_argument("--consumer", default="eval-1")
     ap.add_argument("--wait", type=int, default=240,
                     help="결과를 기다리는 최대 시간(초)")
-    ap.add_argument("--internal-token", default=os.environ.get("INTERNAL_SERVICE_TOKEN"),
+    ap.add_argument("--internal-token", default=os.environ.get("MAP_PROJECT_INTERNAL_SERVICE_TOKEN"),
                     help="서비스끼리 쓰는 공유 표식. 환경변수로 줘도 된다")
     args = ap.parse_args()
 

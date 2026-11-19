@@ -73,6 +73,6 @@ def test_job_does_not_import_provider_or_serving_modules():
 
 def test_job_rejects_runtime_password(monkeypatch, capsys):
     monkeypatch.setenv("AGENT_CHECKPOINT_MIGRATION_DSN", "private-dsn")
-    monkeypatch.setenv("POSTGRES_PASSWORD", "private-runtime")
+    monkeypatch.setenv("AGENT_DATABASE_PASSWORD", "private-runtime")
     assert main() == 1
     assert "private-" not in capsys.readouterr().err
