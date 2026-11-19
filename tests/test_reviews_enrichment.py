@@ -13,14 +13,14 @@ from types import SimpleNamespace
 
 import httpx
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import (
     _build_reason_prompt,
     _build_selection_prompt,
     _fetch_reviews_for,
     recommend_places,
 )
-from app.schemas.agent_schemas import (
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     Mobility,
@@ -188,8 +188,8 @@ def test_review_query_is_prefixed_with_region() -> None:
     """검색어에 지역을 붙여 같은 이름의 다른 지역 가게를 걸러 낸다."""
     from datetime import date, time
 
-    from app.nodes.agent_nodes import _review_query
-    from app.schemas.agent_schemas import AgentRequest, DateRange
+    from map_project_agent.nodes.agent_nodes import _review_query
+    from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange
 
     state = {
         "request": AgentRequest(

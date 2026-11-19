@@ -5,10 +5,10 @@ import asyncio
 import json
 from datetime import date, time
 
-from app import agent_dependencies as deps
-from app.agent_settings import get_settings
-from app.nodes.agent_nodes import build_payload, llm_reason, publish_done
-from app.schemas.agent_schemas import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.nodes.agent_nodes import build_payload, llm_reason, publish_done
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     Place,
@@ -263,7 +263,7 @@ def test_reason_length_shrinks_with_place_count() -> None:
     흔한 8곳 일정에서는 기존과 같은 200자가 나와야 한다 — 이 변경이
     일반적인 요청의 결과물을 바꾸면 안 된다.
     """
-    from app.nodes.agent_nodes import _reason_max_len
+    from map_project_agent.nodes.agent_nodes import _reason_max_len
 
     assert _reason_max_len(4) == 200
     assert _reason_max_len(8) == 200
@@ -282,8 +282,8 @@ def test_long_trip_output_keeps_headroom() -> None:
     90%를 넘겨 여유가 거의 없었다. 절반 아래로 내려 두면 어림이 좀
     틀려도 잘리지 않는다.
     """
-    from app.agent_settings import AgentSettings
-    from app.nodes.agent_nodes import _reason_max_len
+    from map_project_agent.agent_settings import AgentSettings
+    from map_project_agent.nodes.agent_nodes import _reason_max_len
 
     cap = AgentSettings().GEMINI_MAX_OUTPUT_TOKENS
     places = 56
@@ -295,7 +295,7 @@ def test_long_trip_output_keeps_headroom() -> None:
 
 def test_reason_system_carries_the_limit() -> None:
     """system instruction 에 계산된 상한이 실제로 박힌다."""
-    from app.nodes.agent_nodes import _reason_system
+    from map_project_agent.nodes.agent_nodes import _reason_system
 
     assert "80자 이내" in _reason_system(56)
     assert "200자 이내" in _reason_system(8)

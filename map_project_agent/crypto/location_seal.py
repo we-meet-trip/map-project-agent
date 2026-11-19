@@ -11,7 +11,7 @@
 형식:
     v1.<난수>.<암호문+검증표>       두 조각 모두 URL 안전 base64(채움문자 없음)
 
-여는 쪽은 hub(app/crypto/location_seal.py)와 BFF(LocationSeal)다. 세 곳이
+여는 쪽은 hub(map_project_agent/crypto/location_seal.py)와 BFF(LocationSeal)다. 세 곳이
 같은 형식을 쓰며, 한 곳만 바꾸면 그 순간부터 좌표가 오가는 모든 길이
 막히므로 형식을 바꿀 때는 반드시 함께 바꾼다.
 
@@ -28,7 +28,7 @@ import time
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from app.agent_settings import get_settings
+from map_project_agent.agent_settings import get_settings
 
 VERSION = "v1"
 AAD = b"map|loc|v1"

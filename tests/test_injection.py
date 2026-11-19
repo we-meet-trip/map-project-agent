@@ -9,11 +9,11 @@ from __future__ import annotations
 
 from datetime import date, time
 
-from app.nodes.agent_nodes import (
+from map_project_agent.nodes.agent_nodes import (
     _build_places_prompt,
     _build_selection_prompt,
 )
-from app.schemas.agent_schemas import (
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     Mobility,

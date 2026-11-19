@@ -7,15 +7,15 @@ from datetime import date, time
 import pytest
 from pydantic import ValidationError
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import (
     _merge_pinned,
     _pinned_places,
     _remaining_targets,
     parse_input,
     recommend_places,
 )
-from app.schemas.agent_schemas import (
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     Mobility,

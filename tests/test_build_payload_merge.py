@@ -13,8 +13,8 @@ from datetime import date, time
 import pytest
 from pydantic import ValidationError
 
-from app.nodes.agent_nodes import build_payload
-from app.schemas.agent_schemas import AgentRequest, DateRange, Place
+from map_project_agent.nodes.agent_nodes import build_payload
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange, Place
 
 
 def _request() -> AgentRequest:

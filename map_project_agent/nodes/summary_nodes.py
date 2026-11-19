@@ -26,11 +26,11 @@ from typing import TypedDict
 
 from typing_extensions import NotRequired
 
-from app.agent_settings import get_settings
-from app.llm.prompt_json import dump_prompt_json
-from app.llm.structured_call import call_structured
-from app.schemas.agent_schemas import BulletsEnvelope, PlaceBullets
-from app.security.sanitize import sanitize_text
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.llm.prompt_json import dump_prompt_json
+from map_project_agent.llm.structured_call import call_structured
+from map_project_agent.schemas.agent_schemas import BulletsEnvelope, PlaceBullets
+from map_project_agent.security.sanitize import sanitize_text
 
 logger = logging.getLogger(__name__)
 

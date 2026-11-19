@@ -15,7 +15,7 @@ LangGraph 노드들이 본 모듈을 통해 접근한다.
 """
 from __future__ import annotations
 
-from app.clients.agent_clients import (
+from map_project_agent.clients.agent_clients import (
     GeminiClient,
     HubClient,
     StreamsPublisher,
@@ -33,7 +33,7 @@ _gemini: GeminiClient | None = None
 def set_hub_client(client: HubClient) -> None:
     """HubClient 인스턴스를 전역 슬롯에 주입.
 
-    호출처: `app/main.py` lifespan(부팅 단계).
+    호출처: `map_project_agent/main.py` lifespan(부팅 단계).
     """
     global _hub_client
     _hub_client = client
@@ -43,7 +43,7 @@ def get_hub_client() -> HubClient:
     """전역 슬롯에서 HubClient 를 꺼낸다.
 
     슬롯이 비어 있으면 `RuntimeError("HubClient is not initialized")`.
-    호출처: `app/nodes/agent_nodes.py` 의 `fetch_weather` 노드.
+    호출처: `map_project_agent/nodes/agent_nodes.py` 의 `fetch_weather` 노드.
     """
     if _hub_client is None:
         raise RuntimeError("HubClient is not initialized")
@@ -53,7 +53,7 @@ def get_hub_client() -> HubClient:
 def set_streams_publisher(publisher: StreamsPublisher) -> None:
     """StreamsPublisher 인스턴스를 전역 슬롯에 주입.
 
-    호출처: `app/main.py` lifespan(부팅 단계).
+    호출처: `map_project_agent/main.py` lifespan(부팅 단계).
     """
     global _streams
     _streams = publisher
@@ -64,8 +64,8 @@ def get_streams_publisher() -> StreamsPublisher:
 
     슬롯이 비어 있으면 `RuntimeError("StreamsPublisher is not initialized")`.
     호출처:
-      - `app/nodes/agent_nodes.py` 의 `publish_done` 노드.
-      - `app/main.py` 의 `_publish_failure`.
+      - `map_project_agent/nodes/agent_nodes.py` 의 `publish_done` 노드.
+      - `map_project_agent/main.py` 의 `_publish_failure`.
     """
     if _streams is None:
         raise RuntimeError("StreamsPublisher is not initialized")
@@ -75,7 +75,7 @@ def get_streams_publisher() -> StreamsPublisher:
 def set_status_publisher(publisher: StreamsPublisher) -> None:
     """status 스트림(agent:jobs:status) 발행자를 전역 슬롯에 주입.
 
-    호출처: `app/main.py` lifespan(부팅 단계).
+    호출처: `map_project_agent/main.py` lifespan(부팅 단계).
     """
     global _status_streams
     _status_streams = publisher
@@ -85,7 +85,7 @@ def get_status_publisher() -> StreamsPublisher:
     """전역 슬롯에서 status 발행자를 꺼낸다.
 
     슬롯이 비어 있으면 `RuntimeError("StatusPublisher is not initialized")`.
-    호출처: `app/nodes/agent_nodes.py` 의 `_emit_stage` — 예외는 호출측이
+    호출처: `map_project_agent/nodes/agent_nodes.py` 의 `_emit_stage` — 예외는 호출측이
     삼키므로(진행 이벤트는 best-effort), 미주입 환경(단위 테스트)에서도
     잡 실행이 깨지지 않는다.
     """
@@ -97,7 +97,7 @@ def get_status_publisher() -> StreamsPublisher:
 def set_gemini_client(client: GeminiClient) -> None:
     """GeminiClient 인스턴스를 전역 슬롯에 주입.
 
-    호출처: `app/main.py` lifespan(부팅 단계).
+    호출처: `map_project_agent/main.py` lifespan(부팅 단계).
     """
     global _gemini
     _gemini = client
@@ -107,7 +107,7 @@ def get_gemini_client() -> GeminiClient:
     """전역 슬롯에서 GeminiClient 를 꺼낸다.
 
     슬롯이 비어 있으면 `RuntimeError("GeminiClient is not initialized")`.
-    호출처: `app/nodes/agent_nodes.py` 의
+    호출처: `map_project_agent/nodes/agent_nodes.py` 의
       `recommend_places`, `recommend_route` 노드.
     """
     if _gemini is None:
@@ -118,7 +118,7 @@ def get_gemini_client() -> GeminiClient:
 def reset_all() -> None:
     """모든 전역 슬롯을 None 으로 되돌린다.
 
-    호출처: `app/main.py` lifespan 의 종료 finally 블록.
+    호출처: `map_project_agent/main.py` lifespan 의 종료 finally 블록.
     """
     global _hub_client, _streams, _status_streams, _gemini
     _hub_client = None

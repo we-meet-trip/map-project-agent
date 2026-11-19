@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 from datetime import date, time
 
-from app.llm.prompt_json import dump_prompt_json, prune_empty
+from map_project_agent.llm.prompt_json import dump_prompt_json, prune_empty
 
 
 def test_korean_is_not_escaped() -> None:

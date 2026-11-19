@@ -4,11 +4,11 @@ import json
 import httpx
 import pytest
 
-from app import agent_dependencies as deps
-from app.errors import exception_failure
-from app.main import _run_job
-from app.nodes.agent_nodes import recommend_places, search_places
-from app.schemas.agent_schemas import PlaceSelection, PlacesSelection
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.errors import exception_failure
+from map_project_agent.main import _run_job
+from map_project_agent.nodes.agent_nodes import recommend_places, search_places
+from map_project_agent.schemas.agent_schemas import PlaceSelection, PlacesSelection
 from tests.test_graph_routing import _invoke, _FakeHub as GraphHub, _SeqGemini
 from tests.test_grounding import _request, _candidate, _FakeHub, _FakeGemini
 

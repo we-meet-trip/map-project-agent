@@ -7,9 +7,9 @@ from datetime import date, time
 import pytest
 from pydantic import ValidationError
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import search_places
-from app.schemas.agent_schemas import AgentRequest, DateRange, Mobility
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import search_places
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange, Mobility
 
 
 def _request(**overrides) -> AgentRequest:

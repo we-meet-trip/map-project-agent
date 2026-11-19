@@ -2,7 +2,7 @@ import asyncio
 import math
 from datetime import date
 
-from app.nodes.agent_nodes import _daily_pops, plan_strategy
+from map_project_agent.nodes.agent_nodes import _daily_pops, plan_strategy
 from tests.test_timeline import _request
 
 

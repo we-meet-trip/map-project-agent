@@ -12,8 +12,8 @@ in-place 로 다루므로 미선언 키도 그대로 보이기 때문이다. 그
 """
 from __future__ import annotations
 
-from app.graph.agent_graph import build_graph
-from app.nodes.agent_nodes import AgentState
+from map_project_agent.graph.agent_graph import build_graph
+from map_project_agent.nodes.agent_nodes import AgentState
 
 
 def _declared_keys() -> set[str]:
@@ -56,7 +56,7 @@ def test_state_written_keys_are_declared():
     import inspect
     import re
 
-    from app.nodes import agent_nodes
+    from map_project_agent.nodes import agent_nodes
 
     src = inspect.getsource(agent_nodes)
     written = set(re.findall(r'state\[\s*"([a-z_]+)"\s*\]\s*=', src))

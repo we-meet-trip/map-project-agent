@@ -5,8 +5,8 @@ import sys
 
 import pytest
 
-from app.checkpoint_db import MIGRATIONS, checkpoint_schema, validate_history, validate_runtime_schema
-from app.checkpoint_migrate import main
+from map_project_agent.checkpoint_db import MIGRATIONS, checkpoint_schema, validate_history, validate_runtime_schema
+from map_project_agent.checkpoint_migrate import main
 
 
 class Cursor:
@@ -67,7 +67,7 @@ def test_serving_rejects_migration_secret_before_db(monkeypatch):
 
 
 def test_job_does_not_import_provider_or_serving_modules():
-    code = "import app.checkpoint_migrate, sys; assert not any(x in sys.modules for x in ['app.main', 'app.agent_settings', 'app.clients.agent_clients'])"
+    code = "import map_project_agent.checkpoint_migrate, sys; assert not any(x in sys.modules for x in ['map_project_agent.main', 'map_project_agent.agent_settings', 'map_project_agent.clients.agent_clients'])"
     subprocess.run([sys.executable, "-c", code], check=True, env=dict(os.environ))
 
 

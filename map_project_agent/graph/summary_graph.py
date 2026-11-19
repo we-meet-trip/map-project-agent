@@ -1,6 +1,6 @@
 """요약 파이프라인 StateGraph 빌더.
 
-`build_summary_graph()` 는 `app/nodes/summary_nodes.py` 의 노드를 연결한
+`build_summary_graph()` 는 `map_project_agent/nodes/summary_nodes.py` 의 노드를 연결한
 **컴파일된 StateGraph** 를 반환한다. 추천 파이프라인과는 별개의 그래프이며,
 장소별 블로그 후기 두 줄 요약만 담당한다.
 
@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from langgraph.graph import END, START, StateGraph
 
-from app.nodes.summary_nodes import (
+from map_project_agent.nodes.summary_nodes import (
     SummaryState,
     collect_bullets,
     prepare_places,

@@ -13,9 +13,9 @@ from datetime import date, time
 import httpx
 import pytest
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import rules_filter, score_and_rank
-from app.schemas.agent_schemas import AgentRequest, DateRange, Mobility
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import rules_filter, score_and_rank
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange, Mobility
 
 
 def _request(**over) -> AgentRequest:

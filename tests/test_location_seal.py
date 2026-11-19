@@ -12,8 +12,8 @@ import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import SecretStr
 
-from app.agent_settings import get_settings
-from app.crypto import location_seal
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.crypto import location_seal
 
 KEY_B64 = "dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHQ="
 KEY = base64.b64decode(KEY_B64)
@@ -94,8 +94,8 @@ def test_opened_places_become_schema_objects():
     """
     from datetime import date, time
 
-    from app.main import _resolve_places
-    from app.schemas.agent_schemas import (
+    from map_project_agent.main import _resolve_places
+    from map_project_agent.schemas.agent_schemas import (
         AgentRequest,
         DateRange,
         SelectedPlace,
@@ -134,8 +134,8 @@ def test_opened_places_out_of_range_are_refused():
 
     from fastapi import HTTPException
 
-    from app.main import _resolve_places
-    from app.schemas.agent_schemas import AgentRequest, DateRange
+    from map_project_agent.main import _resolve_places
+    from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange
 
     req = AgentRequest(
         date=DateRange(

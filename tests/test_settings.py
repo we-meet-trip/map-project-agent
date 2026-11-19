@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 
-from app.agent_settings import AgentSettings
+from map_project_agent.agent_settings import AgentSettings
 
 
 def test_defaults() -> None:

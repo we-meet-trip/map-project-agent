@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 import pytest
 
-from app.agent_settings import get_settings
+from map_project_agent.agent_settings import get_settings
 
 
 @pytest.fixture(autouse=True)
@@ -26,8 +26,8 @@ def capture_enabled_for_legacy_contract(monkeypatch):
     monkeypatch.setattr(get_settings(), "TRAINING_CAPTURE_ENABLED", True)
 
 
-from app.nodes.agent_nodes import TRAINING_SCHEMA_VERSION, _training_signal
-from app.schemas.agent_schemas import Place
+from map_project_agent.nodes.agent_nodes import TRAINING_SCHEMA_VERSION, _training_signal
+from map_project_agent.schemas.agent_schemas import Place
 
 
 def _place(place_id: int, content_id: str | None) -> Place:
@@ -186,8 +186,8 @@ class TestPayloadSeparation:
     def test_후보가_결과_본문에_섞이지_않는다(self):
         import asyncio
 
-        from app import agent_dependencies as deps
-        from app.nodes.agent_nodes import publish_done
+        from map_project_agent import agent_dependencies as deps
+        from map_project_agent.nodes.agent_nodes import publish_done
 
         captured: dict = {}
 
@@ -227,7 +227,7 @@ class TestRequestAndConfig:
     """
 
     def _request(self):
-        from app.schemas.agent_schemas import AgentRequest
+        from map_project_agent.schemas.agent_schemas import AgentRequest
 
         return AgentRequest(
             date={

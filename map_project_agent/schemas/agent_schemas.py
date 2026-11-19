@@ -10,8 +10,8 @@
   - Streams 발행 페이로드: `JobDonePayload`
 
 사용처:
-  - `app/main.py` : `AgentRequest`, `AgentJobAccepted`, `JobDonePayload`.
-  - `app/nodes/agent_nodes.py` : 위 전체 + `Place`, `Leg`, 두 Envelope.
+  - `map_project_agent/main.py` : `AgentRequest`, `AgentJobAccepted`, `JobDonePayload`.
+  - `map_project_agent/nodes/agent_nodes.py` : 위 전체 + `Place`, `Leg`, 두 Envelope.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from typing import Annotated, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.security.sanitize import neutralize_tags
+from map_project_agent.security.sanitize import neutralize_tags
 
 # LLM 생성 텍스트 필드에서 거부하는 문자: 태그 문자(<, >)와 제어문자.
 # 프롬프트 인젝션 산출물이 페이로드를 타고 하류(클라이언트 렌더링,
@@ -214,7 +214,7 @@ class AgentRequest(BaseModel):
             10개를 넘으면 동선 프롬프트가 감당하기 어려워 상한을 둔다.
 
     호출 흐름:
-      클라이언트 → `app.main.recommend(req)` → `_run_job` →
+      클라이언트 → `map_project_agent.main.recommend(req)` → `_run_job` →
       `graph.ainvoke({"job_id": ..., "request": req})` → LangGraph 노드들이
       `state["request"]` 로 접근.
     """
@@ -597,7 +597,7 @@ class JobDonePayload(BaseModel):
 
     호출처:
       - 성공 경로: `agent_nodes.publish_done` 노드.
-      - 실패 경로: `app/main.py` 의 `_publish_failure`.
+      - 실패 경로: `map_project_agent/main.py` 의 `_publish_failure`.
     """
     job_id: str
     status: Literal["done", "failed"]

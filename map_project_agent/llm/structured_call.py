@@ -23,8 +23,8 @@ from typing import Type, TypeVar
 
 from pydantic import BaseModel
 
-from app.clients.agent_clients import StructuredOutputError
-from app.security.sanitize import sanitize_text
+from map_project_agent.clients.agent_clients import StructuredOutputError
+from map_project_agent.security.sanitize import sanitize_text
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +90,9 @@ async def call_structured(
     컴퓨트를 이 값으로 가늠하는데, 지금은 어디에도 남지 않아 짐작밖에 할 수
     없다. 재시도분도 함께 센다 — 실제로 쓴 양이 그것이기 때문이다.
 
-    호출처: app/nodes/agent_nodes.py 의 LLM 노드들.
+    호출처: map_project_agent/nodes/agent_nodes.py 의 LLM 노드들.
     """
-    from app.agent_dependencies import get_gemini_client
+    from map_project_agent.agent_dependencies import get_gemini_client
 
     gemini = get_gemini_client()
 

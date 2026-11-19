@@ -7,7 +7,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from psycopg import AsyncConnection, sql
 from psycopg.rows import dict_row
 
-from app.checkpoint_db import checkpoint_schema, validate_history, validate_indexes
+from map_project_agent.checkpoint_db import checkpoint_schema, validate_history, validate_indexes
 
 LOCK_ID = 684821308
 

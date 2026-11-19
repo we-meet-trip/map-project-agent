@@ -14,8 +14,8 @@ from langgraph.checkpoint.serde.encrypted import EncryptedSerializer
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from pydantic import SecretStr
 
-from app.agent_settings import AgentSettings
-from app.crypto.checkpoint_seal import (
+from map_project_agent.agent_settings import AgentSettings
+from map_project_agent.crypto.checkpoint_seal import (
     CheckpointCipher,
     CheckpointSealError,
     build_cipher,

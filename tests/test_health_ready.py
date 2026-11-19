@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi.testclient import TestClient
 
-import app.main as main
+import map_project_agent.main as main
 
 
 class _FakePublisher:

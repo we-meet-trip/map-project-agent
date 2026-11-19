@@ -16,9 +16,9 @@ from datetime import date, time
 
 import httpx
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import fetch_weather
-from app.schemas.agent_schemas import AgentRequest, DateRange, Mobility
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import fetch_weather
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange, Mobility
 
 
 def _request(days: int = 3) -> AgentRequest:
@@ -167,7 +167,7 @@ _HUB_WEATHER = {
 
 def test_weather_view_keeps_only_forecast_fields() -> None:
     """발표 시각·지역 대체 같은 운영용 값은 프롬프트에 싣지 않는다."""
-    from app.nodes.agent_nodes import _weather_view
+    from map_project_agent.nodes.agent_nodes import _weather_view
 
     view = _weather_view(_HUB_WEATHER)
     assert set(view) == {"daily"}
@@ -179,7 +179,7 @@ def test_weather_view_keeps_only_forecast_fields() -> None:
 
 def test_weather_brief_folds_the_range() -> None:
     """이유 프롬프트는 기간 전체를 한 줄로 접어 받는다."""
-    from app.nodes.agent_nodes import _weather_brief
+    from map_project_agent.nodes.agent_nodes import _weather_brief
 
     brief = _weather_brief(_HUB_WEATHER)
     assert brief["temp_min"] == 19
@@ -190,7 +190,7 @@ def test_weather_brief_folds_the_range() -> None:
 
 def test_weather_views_tolerate_missing_forecast() -> None:
     """예보를 못 받은 경우에도 프롬프트 조립이 깨지지 않는다."""
-    from app.nodes.agent_nodes import _weather_brief, _weather_view
+    from map_project_agent.nodes.agent_nodes import _weather_brief, _weather_view
 
     for bad in ({}, {"daily": None}, None):
         assert _weather_view(bad) == {}
@@ -201,7 +201,7 @@ def test_weather_views_do_not_mutate_state() -> None:
     """원본은 그대로 둔다 — 일차별 계산이 원본을 읽는다."""
     import copy
 
-    from app.nodes.agent_nodes import _weather_brief, _weather_view
+    from map_project_agent.nodes.agent_nodes import _weather_brief, _weather_view
 
     original = copy.deepcopy(_HUB_WEATHER)
     _weather_view(_HUB_WEATHER)

@@ -110,7 +110,7 @@ class _RecordingLimiter:
 def test_config_passthrough(monkeypatch) -> None:
     """temperature/max_output_tokens/system_instruction 이 config 로 전달된다."""
     fake_models = _install_fake_genai(monkeypatch, '{"value": 7}')
-    from app.clients.agent_clients import GeminiClient
+    from map_project_agent.clients.agent_clients import GeminiClient
 
     limiter = _RecordingLimiter()
     client = GeminiClient(
@@ -143,7 +143,7 @@ def test_config_passthrough(monkeypatch) -> None:
 def test_negative_thinking_budget_omits_config(monkeypatch) -> None:
     """thinking_budget<0 이면 ThinkingConfig 를 설정하지 않는다(모델 기본)."""
     fake_models = _install_fake_genai(monkeypatch, '{"value": 1}')
-    from app.clients.agent_clients import GeminiClient
+    from map_project_agent.clients.agent_clients import GeminiClient
 
     client = GeminiClient(
         api_key="k", model="m", timeout=5.0, thinking_budget=-1
@@ -155,7 +155,7 @@ def test_negative_thinking_budget_omits_config(monkeypatch) -> None:
 def test_retry_config_passthrough(monkeypatch) -> None:
     """재시도 설정이 http_options.retry_options 로 전달되고 429 는 제외된다."""
     _install_fake_genai(monkeypatch, '{"value": 1}')
-    from app.clients.agent_clients import GeminiClient
+    from map_project_agent.clients.agent_clients import GeminiClient
 
     client = GeminiClient(
         api_key="k", model="m", timeout=5.0,
@@ -175,7 +175,7 @@ def test_retry_config_passthrough(monkeypatch) -> None:
 def test_retry_custom_status_codes(monkeypatch) -> None:
     """쉼표 문자열 파싱 — 502/504 확장 가능, 비숫자 토큰은 무시."""
     _install_fake_genai(monkeypatch, '{"value": 1}')
-    from app.clients.agent_clients import GeminiClient
+    from map_project_agent.clients.agent_clients import GeminiClient
 
     client = GeminiClient(
         api_key="k", model="m", retry_attempts=2,
@@ -191,7 +191,7 @@ def test_retry_custom_status_codes(monkeypatch) -> None:
 def test_retry_disabled_paths(monkeypatch) -> None:
     """attempts<=1 또는 빈 코드셋이면 retry_options None; 둘 다 없으면 http_options 생략."""
     _install_fake_genai(monkeypatch, '{"value": 1}')
-    from app.clients.agent_clients import GeminiClient
+    from map_project_agent.clients.agent_clients import GeminiClient
 
     # attempts=1 → 재시도 없음. per-attempt timeout 만 설정 → http_options 존재(timeout만)
     c1 = GeminiClient(api_key="k", model="m", retry_attempts=1,
@@ -213,7 +213,7 @@ def test_retry_disabled_paths(monkeypatch) -> None:
 def test_validation_failure_raises_structured_error(monkeypatch) -> None:
     """스키마 위반 응답이 StructuredOutputError(원문 보존)로 변환된다."""
     _install_fake_genai(monkeypatch, '{"wrong": true}')
-    from app.clients.agent_clients import GeminiClient, StructuredOutputError
+    from map_project_agent.clients.agent_clients import GeminiClient, StructuredOutputError
 
     client = GeminiClient(api_key="k", model="m", timeout=5.0)
     with pytest.raises(StructuredOutputError) as exc_info:
@@ -231,7 +231,7 @@ def test_truncated_response_is_flagged(monkeypatch) -> None:
     같은 자리에서 또 잘리므로 호출측이 재시도를 건너뛴다.
     """
     _install_fake_genai(monkeypatch, '{"value": 1', finish_reason="MAX_TOKENS")
-    from app.clients.agent_clients import GeminiClient, StructuredOutputError
+    from map_project_agent.clients.agent_clients import GeminiClient, StructuredOutputError
 
     client = GeminiClient(api_key="k", model="m", timeout=5.0)
     with pytest.raises(StructuredOutputError) as exc_info:
@@ -242,7 +242,7 @@ def test_truncated_response_is_flagged(monkeypatch) -> None:
 def test_non_truncated_response_is_not_flagged(monkeypatch) -> None:
     """정상 종료인데 형식이 틀린 경우는 잘린 것으로 보지 않는다."""
     _install_fake_genai(monkeypatch, '{"wrong": true}', finish_reason="STOP")
-    from app.clients.agent_clients import GeminiClient, StructuredOutputError
+    from map_project_agent.clients.agent_clients import GeminiClient, StructuredOutputError
 
     client = GeminiClient(api_key="k", model="m", timeout=5.0)
     with pytest.raises(StructuredOutputError) as exc_info:
@@ -252,7 +252,7 @@ def test_non_truncated_response_is_not_flagged(monkeypatch) -> None:
 
 def test_truncation_check_tolerates_unknown_shapes() -> None:
     """응답 구조를 못 읽어도 판정이 예외를 던지지 않는다."""
-    from app.clients.agent_clients import _is_truncated
+    from map_project_agent.clients.agent_clients import _is_truncated
 
     class _EnumLike:
         name = "MAX_TOKENS"

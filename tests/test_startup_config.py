@@ -4,7 +4,7 @@ import pytest
 from psycopg.conninfo import conninfo_to_dict
 from pydantic import SecretStr
 
-from app.main import _checkpoint_conninfo
+from map_project_agent.main import _checkpoint_conninfo
 
 
 @pytest.mark.parametrize("password", ["synthetic@p/a:ss#word", "a b'c\\d%25", ""])

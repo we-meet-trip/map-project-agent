@@ -17,7 +17,7 @@
                    `GeminiQuotaError("gemini_rpm_exceeded")`
   4. RPD 초과    → 즉시 `GeminiQuotaError("gemini_rpd_exceeded")`
 
-사용처: `app/main.py` lifespan 이 생성해 GeminiClient 에 limiter 로 주입.
+사용처: `map_project_agent/main.py` lifespan 이 생성해 GeminiClient 에 limiter 로 주입.
 """
 from __future__ import annotations
 
@@ -125,7 +125,7 @@ class GeminiRateLimiter:
                           gemini_rpm_exceeded.
         tokens_key / daily_key_prefix: Redis 키 이름 규약.
 
-        호출처: `app/main.py` lifespan.
+        호출처: `map_project_agent/main.py` lifespan.
         """
         self._client = aioredis.Redis.from_url(
             redis_url, db=db, decode_responses=True
@@ -187,6 +187,6 @@ class GeminiRateLimiter:
     async def aclose(self) -> None:
         """내부 redis 클라이언트를 닫는다.
 
-        호출처: `app/main.py` lifespan 종료 finally 블록.
+        호출처: `map_project_agent/main.py` lifespan 종료 finally 블록.
         """
         await self._client.aclose()

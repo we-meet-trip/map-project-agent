@@ -11,14 +11,14 @@ from datetime import date, time
 import httpx
 import pytest
 
-from app import agent_dependencies as deps
-from app.agent_settings import get_settings
-from app.nodes.agent_nodes import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.nodes.agent_nodes import (
     _place_from_candidate,
     recommend_places,
     search_places,
 )
-from app.schemas.agent_schemas import (
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     InventedPlace,
@@ -383,7 +383,7 @@ def test_search_places_without_theme_queries_region_once():
 
 def test_theme_keywords_maps_known_and_keeps_unknown():
     """알려진 테마는 한국어로 매핑하고, 모르는 값은 원문을 그대로 쓴다."""
-    from app.nodes.agent_nodes import _theme_keywords
+    from map_project_agent.nodes.agent_nodes import _theme_keywords
 
     assert _theme_keywords(["food", "night"]) == ["맛집", "야경"]
     assert _theme_keywords(["산책"]) == ["산책"]

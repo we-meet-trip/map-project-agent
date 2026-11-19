@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi import HTTPException
 
-from app import agent_dependencies as deps
-from app.agent_settings import get_settings
-from app.clients.agent_clients import StreamsPublisher, _record_usage
-from app.nodes.agent_nodes import _training_signal, load_given_places, parse_input, recommend_route
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.clients.agent_clients import StreamsPublisher, _record_usage
+from map_project_agent.nodes.agent_nodes import _training_signal, load_given_places, parse_input, recommend_route
 from tests.test_route_stage import _request, _selected
 from tests.test_timeline import _leg, _place, _request as timeline_request, _run, _state, _FakeHub
 from eval.scorer import score_case, score_schema, score_timeline
@@ -89,8 +89,8 @@ def test_manual_time_overflow_keeps_selected_places():
 
 @pytest.mark.parametrize("count", [0, 11])
 def test_sealed_places_revalidate_outer_count(monkeypatch, count):
-    from app.main import _resolve_places
-    from app.crypto import location_seal
+    from map_project_agent.main import _resolve_places
+    from map_project_agent.crypto import location_seal
     monkeypatch.setattr(location_seal, "enabled", lambda: True)
     monkeypatch.setattr(location_seal, "open_seal", lambda _: {"places": [_selected()[0].model_dump()] * count})
     with pytest.raises(HTTPException):

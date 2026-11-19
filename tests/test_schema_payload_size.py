@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 
-from app.schemas.agent_schemas import (
+from map_project_agent.schemas.agent_schemas import (
     BulletsEnvelope,
     InventedPlaces,
     PlacesSelection,

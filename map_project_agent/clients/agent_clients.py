@@ -7,8 +7,8 @@ hub HTTP, Redis Streams, Gemini LLM 3종을 캡슐화한다.
   - `StreamsPublisher`  : Redis Streams 에 잡 완료/실패 페이로드를 XADD 발행한다.
   - `GeminiClient`      : Gemini 모델로 평문/구조화 응답을 생성한다.
 
-세 클라이언트 모두 `app/main.py` lifespan 에서 생성되고
-`app/agent_dependencies.py` 전역 슬롯에 주입된다.
+세 클라이언트 모두 `map_project_agent/main.py` lifespan 에서 생성되고
+`map_project_agent/agent_dependencies.py` 전역 슬롯에 주입된다.
 
 타입 변수:
   T — BaseModel 의 서브타입. `GeminiClient.generate_structured` 가
@@ -25,8 +25,8 @@ import httpx
 import redis.asyncio as aioredis
 from pydantic import BaseModel
 
-from app.crypto import location_seal
-from app.agent_settings import get_settings
+from map_project_agent.crypto import location_seal
+from map_project_agent.agent_settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class StructuredOutputError(ValueError):
     """구조화 응답의 JSON 파싱/스키마 검증 실패.
 
     ValueError 하위로 두어 기존 `except (ValidationError, ValueError)`
-    분기와 호환된다. 교정 재시도(`app/llm/structured_call.py`)가 모델에게
+    분기와 호환된다. 교정 재시도(`map_project_agent/llm/structured_call.py`)가 모델에게
     실패 원인을 피드백할 수 있도록 원문과 원인 예외를 보존한다.
 
     raw_text: 모델이 돌려준 검증 실패 원문(빈 문자열일 수 있음).
@@ -102,7 +102,7 @@ class HubClient:
         timeout: HTTP 호출 timeout(초). 본 값은 `httpx.AsyncClient` 의 기본
                  timeout 으로 전달돼 모든 요청에 적용된다.
 
-        호출처: `app/main.py` lifespan.
+        호출처: `map_project_agent/main.py` lifespan.
         """
         headers: dict[str, str] = {}
         if token:
@@ -298,7 +298,7 @@ class HubClient:
     async def aclose(self) -> None:
         """내부 `httpx.AsyncClient` 를 닫는다.
 
-        호출처: `app/main.py` lifespan 종료 finally 블록.
+        호출처: `map_project_agent/main.py` lifespan 종료 finally 블록.
         """
         await self._client.aclose()
 
@@ -334,7 +334,7 @@ class StreamsPublisher:
         내부적으로 `decode_responses=True` 로 클라이언트를 만들어
         XADD 결과(message id) 가 문자열로 돌아오게 한다.
 
-        호출처: `app/main.py` lifespan.
+        호출처: `map_project_agent/main.py` lifespan.
         """
         self._client = aioredis.Redis.from_url(
             redis_url, db=db, decode_responses=True
@@ -381,7 +381,7 @@ class StreamsPublisher:
 
         호출처:
           - `agent_nodes.publish_done` (성공 경로).
-          - `app/main.py._publish_failure` (실패 경로).
+          - `map_project_agent/main.py._publish_failure` (실패 경로).
         """
         xadd_kwargs: dict = {}
         if self._maxlen > 0:
@@ -453,7 +453,7 @@ class StreamsPublisher:
     async def aclose(self) -> None:
         """내부 redis 클라이언트를 닫는다.
 
-        호출처: `app/main.py` lifespan 종료 finally 블록.
+        호출처: `map_project_agent/main.py` lifespan 종료 finally 블록.
         """
         await self._client.aclose()
 
@@ -527,7 +527,7 @@ class GeminiClient:
         http_timeout_seconds: per-attempt HTTP 타임아웃(초). HttpOptions.
                         timeout(ms) 로 전달. 0 이하이면 미설정.
         limiter: `acquire()` 코루틴을 가진 rate limiter
-                 (`app/llm/rate_limit.GeminiRateLimiter`). None 이면
+                 (`map_project_agent/llm/rate_limit.GeminiRateLimiter`). None 이면
                  rate-limit 없이 호출한다(단위 테스트 등).
 
         지연 import: `from google import genai` 를 메서드 호출 직전이 아닌
@@ -535,7 +535,7 @@ class GeminiClient:
         설정이 모두 비활성이면 http_options 를 넘기지 않아 기존 경로와
         완전히 동일하게 동작한다.
 
-        호출처: `app/main.py` lifespan.
+        호출처: `map_project_agent/main.py` lifespan.
         """
         from google import genai
         from google.genai import types as genai_types
@@ -635,7 +635,7 @@ class GeminiClient:
           - JSON 파싱/스키마 검증 실패: `StructuredOutputError`
             (ValueError 하위, 원문·원인 보존 — 교정 재시도용).
 
-        호출처: `app/llm/structured_call.call_structured` (예산·교정 재시도
+        호출처: `map_project_agent/llm/structured_call.call_structured` (예산·교정 재시도
         계층). 노드가 직접 호출하지 않는다.
         """
         from google.genai import types as genai_types

@@ -14,7 +14,7 @@ import json
 
 import pytest
 
-from app.nodes.agent_nodes import (
+from map_project_agent.nodes.agent_nodes import (
     _AFFINITY_MAX,
     _segment_gain,
 )
@@ -122,7 +122,7 @@ class TestGain:
 class TestCombination:
     def test_두_가점을_합하지_않는다(self):
         # 합하면 상한이 무너진다. 큰 것 하나만 쓴다.
-        from app.nodes.agent_nodes import _affinity
+        from map_project_agent.nodes.agent_nodes import _affinity
 
         cand = {"content_id": "a", "category_group_code": "CE7", "category": "카페"}
         segment = {"places": {"a": {"shown": 5, "saved": 5, "rate": 1.0}}}
@@ -140,7 +140,7 @@ class TestCombination:
 class TestLoading:
     @pytest.fixture(autouse=True)
     def isolated_cache(self, monkeypatch):
-        from app.nodes import agent_nodes
+        from map_project_agent.nodes import agent_nodes
         monkeypatch.setattr(agent_nodes, "_SEGMENT_STATS", None)
         monkeypatch.setattr(agent_nodes, "_SEGMENT_STATS_LOADED", False)
 
@@ -150,7 +150,7 @@ class TestLoading:
         {"segments": {"unknown|unknown": {"places": {"a": []}}}}])
     def test_malformed_artifact_is_cached_as_empty(self, tmp_path, monkeypatch, stats):
         from types import SimpleNamespace
-        from app.nodes import agent_nodes
+        from map_project_agent.nodes import agent_nodes
         path = tmp_path / "stats.json"
         path.write_text(json.dumps(stats))
         monkeypatch.setattr(agent_nodes, "get_settings", lambda: SimpleNamespace(SEGMENT_STATS_PATH=str(path)))
@@ -160,7 +160,7 @@ class TestLoading:
 
     def test_valid_artifact_is_unchanged_and_loaded_once(self, tmp_path, monkeypatch):
         from types import SimpleNamespace
-        from app.nodes import agent_nodes
+        from map_project_agent.nodes import agent_nodes
         stats = build([_row("unknown", "unknown", [_cand("a", True)])] * 3, min_support=3)
         path = tmp_path / "stats.json"
         path.write_text(json.dumps(stats))
@@ -173,7 +173,7 @@ class TestLoading:
     @pytest.mark.parametrize("raw", [b"{broken", b"\xff", b"[" * 2000 + b"0" + b"]" * 2000])
     def test_unreadable_or_excessively_nested_json_is_ignored(self, tmp_path, monkeypatch, raw):
         from types import SimpleNamespace
-        from app.nodes import agent_nodes
+        from map_project_agent.nodes import agent_nodes
         path = tmp_path / "stats.json"
         path.write_bytes(raw)
         monkeypatch.setattr(agent_nodes, "get_settings", lambda: SimpleNamespace(SEGMENT_STATS_PATH=str(path)))
@@ -186,8 +186,8 @@ class TestLoading:
         import asyncio
         from types import SimpleNamespace
         from unittest.mock import AsyncMock
-        from app import agent_dependencies
-        from app.nodes import agent_nodes
+        from map_project_agent import agent_dependencies
+        from map_project_agent.nodes import agent_nodes
 
         path = tmp_path / "stats.json"
         path.write_text(json.dumps(stats))

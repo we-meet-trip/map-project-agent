@@ -3,9 +3,9 @@ import asyncio
 
 import httpx
 
-from app.clients.agent_clients import StructuredOutputError
-from app.llm.rate_limit import GeminiQuotaError
-from app.llm.structured_call import LLMBudgetExceeded
+from map_project_agent.clients.agent_clients import StructuredOutputError
+from map_project_agent.llm.rate_limit import GeminiQuotaError
+from map_project_agent.llm.structured_call import LLMBudgetExceeded
 
 
 def failure(code: str = "generation_failed", retryable: bool = False) -> dict:

@@ -1,7 +1,7 @@
 """LangGraph StateGraph 빌더.
 
-`build_graph()` 는 `app/nodes/agent_nodes.py` 의 추천 파이프라인 노드를
-연결한 **컴파일된 StateGraph** 를 반환한다. `app/main.py` lifespan 이 1회
+`build_graph()` 는 `map_project_agent/nodes/agent_nodes.py` 의 추천 파이프라인 노드를
+연결한 **컴파일된 StateGraph** 를 반환한다. `map_project_agent/main.py` lifespan 이 1회
 호출해 `app.state.graph` 에 저장하고, `_run_job` 이
 `graph.ainvoke({"job_id": ..., "request": ...}, config=...)` 로 실행한다.
 
@@ -20,7 +20,7 @@
 
 블로그 후기 요약은 이 그래프에 없다. 요약은 일정에 딸려 나오는 값이 아니라
 장소를 눌렀을 때 필요한 정보이므로 별도 파이프라인
-(`app/graph/summary_graph.py`)이 맡는다.
+(`map_project_agent/graph/summary_graph.py`)이 맡는다.
 
 stage="route" 분기:
   사용자가 방문지를 이미 골라 온 요청은 탐색·선정 구간이 통째로 불필요하다.
@@ -52,7 +52,7 @@ from __future__ import annotations
 
 from langgraph.graph import END, START, StateGraph
 
-from app.nodes.agent_nodes import (
+from map_project_agent.nodes.agent_nodes import (
     AgentState,
     build_payload,
     build_timeline,

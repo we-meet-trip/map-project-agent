@@ -23,9 +23,9 @@ import json
 from datetime import date, time
 from typing import Literal, Union, get_args, get_origin
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import publish_done
-from app.schemas import agent_schemas as S
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import publish_done
+from map_project_agent.schemas import agent_schemas as S
 
 
 def _type_repr(tp) -> str:

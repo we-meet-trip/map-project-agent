@@ -5,7 +5,7 @@
 #   1) builder stage  : 컴파일 도구를 설치하고 requirements.txt 를 휠로 빌드해 /wheels 에 모은다.
 #   2) runtime stage  : 슬림 베이스 위에 builder 가 만든 휠만 사용해 의존성을 설치한다.
 #                       빌드 도구가 빠져 이미지 크기가 작고, 런타임에는 네트워크 의존성이 없다.
-# 비루트 사용자(app, uid=10001) 로 컨테이너를 띄우며, uvicorn 으로 app.main:app 을 노출한다.
+# 비루트 사용자(app, uid=10001) 로 컨테이너를 띄우며, uvicorn 으로 map_project_agent.main:app 을 노출한다.
 
 # ARG PYTHON_VERSION
 #   - builder/runtime 양쪽 FROM 에서 공통으로 쓰는 Python 베이스 태그.
@@ -45,9 +45,9 @@ RUN apt-get purge -y --allow-remove-essential perl-base \
  && test ! -e /usr/bin/perl \
  && test -z "$(find /usr/bin /usr/sbin -xdev -type f -perm /6000 -print -quit)"
 # 애플리케이션 소스를 app 사용자 소유로 복사.
-COPY --chown=app:app app ./app
+COPY --chown=app:app map_project_agent ./map_project_agent
 USER app
-RUN python -c "import app.main; from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver"
+RUN python -c "import map_project_agent.main; from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver"
 EXPOSE 8000
 # HEALTHCHECK
 #   - /health 엔드포인트가 200 을 돌려주면 healthy.
@@ -55,5 +55,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=4).status==200 else 1)"
 # ENTRYPOINT
-#   - uvicorn 으로 app.main 모듈의 `app` (FastAPI 인스턴스) 를 0.0.0.0:8000 에 바인딩.
-ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+#   - uvicorn 으로 map_project_agent.main 모듈의 `app` (FastAPI 인스턴스) 를 0.0.0.0:8000 에 바인딩.
+ENTRYPOINT ["uvicorn", "map_project_agent.main:app", "--host", "0.0.0.0", "--port", "8000"]

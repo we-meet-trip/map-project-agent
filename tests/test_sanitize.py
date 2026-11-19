@@ -1,7 +1,7 @@
 """sanitize_text / sanitize_struct / neutralize_tags 단위 테스트."""
 from __future__ import annotations
 
-from app.security.sanitize import (
+from map_project_agent.security.sanitize import (
     neutralize_tags,
     sanitize_struct,
     sanitize_text,
@@ -74,7 +74,7 @@ def test_neutralize_tags_passthrough_safe_and_nonstr() -> None:
 
 def test_neutralize_tags_output_passes_place_validator() -> None:
     """치환 결과는 Place 검증기(_FORBIDDEN_TEXT_RE)를 통과한다."""
-    from app.schemas.agent_schemas import _reject_tags_and_control
+    from map_project_agent.schemas.agent_schemas import _reject_tags_and_control
 
     out = neutralize_tags("음식점 > 카페")
     # 예외를 던지지 않고 값을 그대로 돌려주면 통과한 것이다.

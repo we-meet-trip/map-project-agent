@@ -18,9 +18,9 @@ from datetime import date, time
 
 import httpx
 
-from app import agent_dependencies as deps
-from app.nodes.agent_nodes import build_timeline, fit_time_budget
-from app.schemas.agent_schemas import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.nodes.agent_nodes import build_timeline, fit_time_budget
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     DateRange,
     Leg,
@@ -238,7 +238,7 @@ def test_transit_mobility_discloses_estimated_travel() -> None:
 
 def test_disabled_flag_keeps_payload_as_before() -> None:
     """스위치를 끄면 시각을 만들지 않아 도입 전과 같은 상태로 남는다."""
-    from app.agent_settings import get_settings
+    from map_project_agent.agent_settings import get_settings
 
     settings = get_settings()
     original = settings.TIMELINE_ENABLED
@@ -259,7 +259,7 @@ def test_disabled_flag_keeps_payload_as_before() -> None:
 
 def test_plan_strategy_uses_each_days_precipitation() -> None:
     """실내 비중을 여행 전체가 아니라 그날 강수확률로 정한다."""
-    from app.nodes.agent_nodes import plan_strategy
+    from map_project_agent.nodes.agent_nodes import plan_strategy
 
     state = {
         "job_id": "j",
@@ -284,7 +284,7 @@ def test_plan_strategy_uses_each_days_precipitation() -> None:
 
 def test_plan_strategy_scales_stops_with_active_hours() -> None:
     """활동 시간이 짧으면 그날 목표 장소 수도 줄어든다."""
-    from app.nodes.agent_nodes import plan_strategy
+    from map_project_agent.nodes.agent_nodes import plan_strategy
 
     short = asyncio.run(plan_strategy(
         {"job_id": "j", "request": _request(end_hour=11), "weather": {}}
@@ -299,7 +299,7 @@ def test_plan_strategy_scales_stops_with_active_hours() -> None:
 
 def test_plan_strategy_fills_missing_weather_days() -> None:
     """예보가 모자란 날도 전략은 여행 일수만큼 나온다."""
-    from app.nodes.agent_nodes import plan_strategy
+    from map_project_agent.nodes.agent_nodes import plan_strategy
 
     out = asyncio.run(plan_strategy({
         "job_id": "j",
@@ -317,7 +317,7 @@ def test_plan_strategy_matches_weather_by_date_not_position() -> None:
     hub 는 예보를 못 구한 날을 목록에서 빼고 보낸다. 배열 위치로 세면
     1일차가 나흘 뒤 강수확률을 받아, 맑은 날이 비 오는 날로 뒤바뀐다.
     """
-    from app.nodes.agent_nodes import plan_strategy
+    from map_project_agent.nodes.agent_nodes import plan_strategy
 
     # 여행은 첫째 날부터 3일. 그런데 hub 가 앞 이틀을 못 주고
     # 사흘째와 그 뒤 날짜만 보냈다.

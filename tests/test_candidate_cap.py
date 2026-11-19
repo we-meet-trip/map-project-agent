@@ -13,12 +13,12 @@ from __future__ import annotations
 import asyncio
 from datetime import date, time
 
-from app.nodes.agent_nodes import (
+from map_project_agent.nodes.agent_nodes import (
     _cap_candidates,
     _candidate_limit,
     recommend_places,
 )
-from app.schemas.agent_schemas import AgentRequest, DateRange
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange
 
 # 실내로 판정되는 카카오 카테고리 그룹 중 하나.
 _INDOOR = "CE7"
@@ -111,8 +111,8 @@ def test_recommend_places_caps_before_prompting() -> None:
     """노드를 통과하면 상한을 넘는 후보가 프롬프트에 실리지 않는다."""
     import json
 
-    from app import agent_dependencies as deps
-    from app.schemas.agent_schemas import PlaceSelection, PlacesSelection
+    from map_project_agent import agent_dependencies as deps
+    from map_project_agent.schemas.agent_schemas import PlaceSelection, PlacesSelection
 
     envelope = PlacesSelection(
         selections=[

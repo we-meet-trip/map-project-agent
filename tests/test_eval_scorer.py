@@ -185,7 +185,7 @@ class TestTimelineUsesVisitOrder:
         }
 
     def test_배열이_뒤섞여도_방문_순서가_맞으면_통과(self):
-        from app.nodes import agent_nodes  # noqa: F401  (import 경로 확인용)
+        from map_project_agent.nodes import agent_nodes  # noqa: F401  (import 경로 확인용)
         from eval.scorer import score_timeline
 
         # 배열로 읽으면 10:00 → 15:56 → 11:15 로 역행이지만,

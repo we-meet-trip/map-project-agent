@@ -12,10 +12,10 @@ from datetime import date, time
 import pytest
 from pydantic import ValidationError
 
-from app import agent_dependencies as deps
-from app.graph.agent_graph import build_graph
-from app.nodes.agent_nodes import load_given_places, parse_input
-from app.schemas.agent_schemas import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.graph.agent_graph import build_graph
+from map_project_agent.nodes.agent_nodes import load_given_places, parse_input
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     BulletsEnvelope,
     DateRange,

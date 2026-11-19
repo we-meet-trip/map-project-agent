@@ -38,7 +38,7 @@ from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import ValidationError
 
-from app.agent_dependencies import (
+from map_project_agent.agent_dependencies import (
     get_streams_publisher,
     reset_all,
     set_gemini_client,
@@ -46,19 +46,19 @@ from app.agent_dependencies import (
     set_status_publisher,
     set_streams_publisher,
 )
-from app.crypto import location_seal
-from app.errors import exception_failure, failure
-from app.agent_settings import get_settings
-from app.clients.agent_clients import (
+from map_project_agent.crypto import location_seal
+from map_project_agent.errors import exception_failure, failure
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.clients.agent_clients import (
     GeminiClient,
     HubClient,
     StreamsPublisher,
 )
-from app.graph.agent_graph import build_graph
-from app.graph.summary_graph import SUMMARY_GRAPH
-from app.llm.rate_limit import GeminiQuotaError, GeminiRateLimiter
-from app.llm.structured_call import LLMBudgetExceeded
-from app.schemas.agent_schemas import (
+from map_project_agent.graph.agent_graph import build_graph
+from map_project_agent.graph.summary_graph import SUMMARY_GRAPH
+from map_project_agent.llm.rate_limit import GeminiQuotaError, GeminiRateLimiter
+from map_project_agent.llm.structured_call import LLMBudgetExceeded
+from map_project_agent.schemas.agent_schemas import (
     AgentJobAccepted,
     AgentRequest,
     JobDonePayload,
@@ -91,7 +91,7 @@ def _configure_logging(level: str) -> None:
     """루트 로거에 stdout 핸들러를 붙인다(핸들러가 없을 때만).
 
     uvicorn 의 기본 로깅 설정은 `uvicorn*` 로거만 구성하고 루트 로거는
-    건드리지 않는다. 그래서 이 함수 없이는 `app.*` 로거로 남긴 기록이
+    건드리지 않는다. 그래서 이 함수 없이는 `map_project_agent.*` 로거로 남긴 기록이
     출력 대상을 못 찾아 전량 유실된다.
 
     이미 핸들러가 있으면(uvicorn `--log-config`, 테스트 하니스, 상위
@@ -124,7 +124,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
       - HubClient, StreamsPublisher, GeminiClient 를 만들어 모듈 전역 슬롯
         (`set_hub_client` / `set_streams_publisher` / `set_gemini_client`) 에
         주입한다. LangGraph 노드들은 함수 내부 import 와 getter 로 본 슬롯을
-        참조한다(`app/agent_dependencies.py`).
+        참조한다(`map_project_agent/agent_dependencies.py`).
       - `build_graph()` 로 컴파일된 LangGraph 를 `app.state.graph` 에 저장.
       - `app.state.bg_tasks` 는 `_run_job` 태스크들을 추적하는 집합.
       - `app.state.job_timeout_seconds` 는 잡 1건당 허용 시간(`_run_job`에서 사용).
@@ -219,8 +219,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         from psycopg.rows import dict_row
         from psycopg_pool import AsyncConnectionPool
 
-        from app.crypto.checkpoint_seal import build_cipher
-        from app.checkpoint_db import checkpoint_schema, validate_runtime_schema
+        from map_project_agent.crypto.checkpoint_seal import build_cipher
+        from map_project_agent.checkpoint_db import checkpoint_schema, validate_runtime_schema
 
         try:
             schema = checkpoint_schema(settings.LANGGRAPH_SCHEMA)

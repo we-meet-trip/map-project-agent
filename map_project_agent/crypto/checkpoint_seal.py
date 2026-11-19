@@ -17,7 +17,7 @@ import os
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from app.agent_settings import AgentSettings
+from map_project_agent.agent_settings import AgentSettings
 
 CIPHER_PREFIX = "aesgcm:"
 AAD = b"map|ckpt|v1"

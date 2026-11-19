@@ -15,7 +15,7 @@
 
 의존성 접근 패턴:
   순환 import 회피와 lifespan 주입 순서 보장을 위해, 각 노드 함수는
-  본문 안에서 `from app.agent_dependencies import get_xxx` 를 호출한다.
+  본문 안에서 `from map_project_agent.agent_dependencies import get_xxx` 를 호출한다.
 """
 from __future__ import annotations
 
@@ -30,17 +30,17 @@ import httpx
 from pydantic import ValidationError
 from typing_extensions import NotRequired
 
-from app.agent_settings import get_settings
-from app.errors import exception_failure, failure
-from app.llm.prompt_json import dump_prompt_json
-from app.llm.structured_call import call_structured
-from app.security.sanitize import (
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.errors import exception_failure, failure
+from map_project_agent.llm.prompt_json import dump_prompt_json
+from map_project_agent.llm.structured_call import call_structured
+from map_project_agent.security.sanitize import (
     neutralize_tags,
     sanitize_struct,
     sanitize_text,
 )
-from app.llm.structured_call import LLMBudgetExceeded
-from app.schemas.agent_schemas import (
+from map_project_agent.llm.structured_call import LLMBudgetExceeded
+from map_project_agent.schemas.agent_schemas import (
     AgentRequest,
     JobDonePayload,
     Leg,
@@ -611,7 +611,7 @@ async def _emit_stage(state: AgentState, stage: str) -> None:
     노드 이름 그대로다(parse_input, fetch_weather, ...).
     """
     try:
-        from app.agent_dependencies import get_status_publisher
+        from map_project_agent.agent_dependencies import get_status_publisher
 
         publisher = get_status_publisher()
         await publisher.publish_status(job_id=state["job_id"], stage=stage)
@@ -713,7 +713,7 @@ async def _verify_selected_places(
     state: AgentState, selected: list[SelectedPlace]
 ) -> list[Place]:
     """지도에서 되돌려 받은 값도 출처 검색 결과와 대조하고 원본 좌표를 쓴다."""
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     req = state["request"]
     verified: list[Place] = []
@@ -796,7 +796,7 @@ async def fetch_weather(state: AgentState) -> AgentState:
     await _emit_stage(state, "fetch_weather")
     if state.get("error"):
         return state
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     req = state["request"]
     client = get_hub_client()
@@ -998,7 +998,7 @@ async def search_places(state: AgentState) -> AgentState:
     await _emit_stage(state, "search_places")
     if state.get("error"):
         return state
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     req = state["request"]
     client = get_hub_client()
@@ -1264,7 +1264,7 @@ async def rules_filter(state: AgentState) -> AgentState:
         "lat": sum(lat for lat, _ in coords) / len(coords),
         "lng": sum(lng for _, lng in coords) / len(coords),
     }
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     client = get_hub_client()
     try:
@@ -1373,7 +1373,7 @@ async def score_and_rank(state: AgentState) -> AgentState:
     ]
     if not pois:
         return state
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     client = get_hub_client()
     try:
@@ -1656,7 +1656,7 @@ async def _fetch_reviews_for(
     호출처: `_select_places` (grounded 경로, 선정 프롬프트 조립 직전).
     """
     try:
-        from app.agent_dependencies import get_hub_client
+        from map_project_agent.agent_dependencies import get_hub_client
 
         client = get_hub_client()
     except Exception:  # noqa: BLE001 — 리뷰 보강은 잡을 죽이지 않는다
@@ -2154,7 +2154,7 @@ async def build_timeline(state: AgentState) -> AgentState:
 
     호출처: LangGraph(recommend_route 다음).
     """
-    from app.agent_dependencies import get_hub_client
+    from map_project_agent.agent_dependencies import get_hub_client
 
     await _emit_stage(state, "build_timeline")
     if state.get("error"):
@@ -2561,10 +2561,10 @@ async def publish_done(state: AgentState) -> AgentState:
       - `model_dump_json(by_alias=True)` 로 직렬화해 publish.
 
     참고:
-      `_publish_failure` (`app/main.py`) 는 그래프 실행 자체가 죽어서
+      `_publish_failure` (`map_project_agent/main.py`) 는 그래프 실행 자체가 죽어서
       본 노드까지 못 갈 때(예: 타임아웃) 사용되는 별도 경로다.
     """
-    from app.agent_dependencies import get_streams_publisher
+    from map_project_agent.agent_dependencies import get_streams_publisher
 
     job_id = state["job_id"]
     publisher = get_streams_publisher()

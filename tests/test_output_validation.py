@@ -12,9 +12,9 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import SecretStr, ValidationError
 
-from app import agent_settings
-from app.agent_settings import AgentSettings
-from app.schemas.agent_schemas import Place, PlaceSelection
+from map_project_agent import agent_settings
+from map_project_agent.agent_settings import AgentSettings
+from map_project_agent.schemas.agent_schemas import Place, PlaceSelection
 
 
 def _place(**overrides) -> Place:
@@ -90,7 +90,7 @@ def _set_settings(monkeypatch, token: str | None) -> None:
 def test_recommend_rejects_missing_or_wrong_token(monkeypatch) -> None:
     """토큰 설정 시: 헤더 부재/불일치 → 401 (graph 검사 이전)."""
     _set_settings(monkeypatch, token="secret-token")
-    from app.main import app
+    from map_project_agent.main import app
 
     client = TestClient(app)  # with 미사용 → lifespan 미기동
     assert client.post("/v1/recommend", json=_BODY).status_code == 401
@@ -104,7 +104,7 @@ def test_recommend_rejects_missing_or_wrong_token(monkeypatch) -> None:
 def test_recommend_accepts_valid_token_then_503(monkeypatch) -> None:
     """올바른 토큰 → 인증 통과 후 graph 부재로 503 (401 아님)."""
     _set_settings(monkeypatch, token="secret-token")
-    from app.main import app
+    from map_project_agent.main import app
 
     client = TestClient(app)
     r = client.post(
@@ -117,7 +117,7 @@ def test_recommend_accepts_valid_token_then_503(monkeypatch) -> None:
 def test_recommend_skips_check_when_token_unset(monkeypatch) -> None:
     """토큰 미설정(PoC 로컬) → 검증 생략(503 도달), 401 아님."""
     _set_settings(monkeypatch, token=None)
-    from app.main import app
+    from map_project_agent.main import app
 
     client = TestClient(app)
     assert client.post("/v1/recommend", json=_BODY).status_code == 503

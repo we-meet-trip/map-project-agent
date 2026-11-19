@@ -10,9 +10,9 @@ import asyncio
 import pytest
 from pydantic import BaseModel
 
-from app import agent_dependencies as deps
-from app.clients.agent_clients import StructuredOutputError
-from app.llm.structured_call import LLMBudgetExceeded, call_structured
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.clients.agent_clients import StructuredOutputError
+from map_project_agent.llm.structured_call import LLMBudgetExceeded, call_structured
 
 
 class _Echo(BaseModel):

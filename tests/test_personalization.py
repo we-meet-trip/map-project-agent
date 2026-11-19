@@ -12,14 +12,14 @@ from __future__ import annotations
 import asyncio
 from datetime import date, time
 
-from app import agent_dependencies as deps
-from app.agent_settings import get_settings
-from app.nodes.agent_nodes import (
+from map_project_agent import agent_dependencies as deps
+from map_project_agent.agent_settings import get_settings
+from map_project_agent.nodes.agent_nodes import (
     _AFFINITY_MAX,
     _affinity,
     score_and_rank,
 )
-from app.schemas.agent_schemas import AgentRequest, DateRange
+from map_project_agent.schemas.agent_schemas import AgentRequest, DateRange
 
 
 def _request(theme=None) -> AgentRequest:
