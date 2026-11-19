@@ -1,6 +1,6 @@
 \set ON_ERROR_STOP on
 -- Run as a dedicated provisioning operator against the explicitly selected DB.
--- No passwords; R7 sets LOGIN credentials through its secret channel separately.
+-- No passwords here; set LOGIN passwords separately through the deployment's secret store.
 -- Reapply after every migration. Existing rows/history and other roles' ACLs survive.
 BEGIN;
 DO $roles$
