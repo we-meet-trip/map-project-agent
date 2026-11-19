@@ -2,7 +2,7 @@
 
 쓰는 법:
   python -m eval.run --results <결과디렉터리> [--training <신호디렉터리>]
-  python -m eval.run --results out/gemini --baseline eval/baseline.json
+  python -m eval.run --results out/gemini --baseline out/baseline.json
 
 결과 디렉터리에는 케이스 하나당 파일 하나를 <case_id>.json 으로 둔다.
 내용은 완료 페이로드(JobDonePayload) 그대로다. 신호 디렉터리를 함께 주면

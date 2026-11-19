@@ -44,14 +44,16 @@
 
 ```
 python -m eval.run --results out/gemini
-python -m eval.run --results out/gemini --baseline eval/baseline.json
-python -m eval.run --results out/gemini --baseline eval/baseline.json --write-baseline
+python -m eval.run --results out/gemini --baseline out/baseline.json --write-baseline
+python -m eval.run --results out/gemini --baseline out/baseline.json
 ```
 
 기준선을 주면 축마다 견주어, 나빠진 폭이 허용치를 넘을 때 0 이 아닌 값으로
 끝난다. 사람이 표를 눈으로 대조하지 않아도 회귀가 드러난다.
 
-기존 `baseline.json`은 보존한다. 변경된 검증기는 숫자 좌표 범위, 출처,
+기준선 파일은 레포에 두지 않는다. 자기 환경에서 처음 모은 결과로
+`--write-baseline` 을 한 번 실행해 만들고, 그 뒤의 결과를 그것과 견준다.
+검증기는 숫자 좌표 범위, 출처,
 종료 시각·체류·이동 시간·시각 누락 및 명시하지 않은 수동 순서 변경을 검사한다.
 기준선 유무와 관계없이 기본 품질 실패는 종료값 1이며 불량 결과로 기준선을
 덮어쓸 수 없다. `invented_ratio`는 기존 비교 키를 유지하며 실측 확인이 안 된
