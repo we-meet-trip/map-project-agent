@@ -2493,7 +2493,7 @@ def _training_signal(state: AgentState) -> str | None:
         "schema_version": TRAINING_SCHEMA_VERSION,
         "path": path,
         "grounded": bool(state.get("grounded")),
-        "model": settings.GEMINI_MODEL,
+        "model": "fake" if settings.LLM_PROVIDER == "fake" else settings.GEMINI_MODEL,
         "candidate_count": len(candidates),
         "candidates": [
             {

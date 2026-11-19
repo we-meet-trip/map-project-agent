@@ -117,3 +117,16 @@ def test_full_graph_runs_with_fake_provider() -> None:
     assert payload["places"]
     assert all(p["reason"].startswith(SYNTHETIC_MARK) for p in payload["places"])
     assert payload["clothing"].startswith(SYNTHETIC_MARK)
+
+
+def test_training_signal_names_the_fake_provider(monkeypatch) -> None:
+    """합성 결과로 만든 학습 신호가 실제 모델 이름을 달지 않는다."""
+    from map_project_agent.agent_settings import get_settings
+    from map_project_agent.nodes.agent_nodes import _training_signal
+    import json
+
+    monkeypatch.setattr(get_settings(), "TRAINING_CAPTURE_ENABLED", True)
+    monkeypatch.setattr(get_settings(), "LLM_PROVIDER", "fake")
+    signal = json.loads(_training_signal({"selection_path": "select", "candidates": []}))
+
+    assert signal["model"] == "fake"

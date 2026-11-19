@@ -311,8 +311,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.bg_tasks: set[asyncio.Task] = set()
     app.state.job_timeout_seconds = settings.JOB_TIMEOUT_SECONDS
     logger.info(
-        "agent: lifespan initialized model=%s job_timeout=%.1fs",
-        settings.GEMINI_MODEL, settings.JOB_TIMEOUT_SECONDS,
+        "agent: lifespan initialized llm=%s job_timeout=%.1fs",
+        "fake" if settings.LLM_PROVIDER == "fake" else settings.GEMINI_MODEL,
+        settings.JOB_TIMEOUT_SECONDS,
     )
     try:
         yield
