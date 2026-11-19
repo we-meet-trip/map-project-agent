@@ -1032,7 +1032,7 @@ async def search_places(state: AgentState) -> AgentState:
         state["grounded"] = False
         return state
     candidates = _merge_place_results(results)
-    # Mode 1 재탐색(stage="mode1")의 exclude 반영: 직전 추천 장소의
+    # 재탐색(stage="reexplore")의 exclude 반영: 직전 추천 장소의
     # content_id 를 후보에서 제거한다(재탐색 제외 목록). content_id
     # 가 없는 후보는 대조 불가라 통과시킨다. 전량 제외되면 요청 조건을
     # 바꾸지 않고 다음 선정 노드에서 no_matching_places로 종료한다.
@@ -1410,7 +1410,7 @@ async def score_and_rank(state: AgentState) -> AgentState:
 async def recommend_places(state: AgentState) -> AgentState:
     """실측 후보에서만 선정한다. 후보 부족/선택 실패는 명시 오류로 끝낸다.
 
-    mode1에서 유지한 장소도 출처를 확인한 뒤 새 선정 결과와 병합한다.
+    재탐색(reexplore)에서 유지한 장소도 출처를 확인한 뒤 새 선정 결과와 병합한다.
     모델에는 후보 인덱스만 고르게 하며 장소/좌표를 창작하는 경로는 없다.
     """
     await _emit_stage(state, "recommend_places")
@@ -1454,11 +1454,11 @@ async def recommend_places(state: AgentState) -> AgentState:
 def _pinned_places(state: AgentState) -> list[Place]:
     """재탐색 요청에 실려 온 "남길 장소"를 `Place` 로 세운다.
 
-    stage 가 mode1 이 아니거나 목록이 비어 있으면 빈 목록이다 — 그 경우
+    stage 가 reexplore 가 아니거나 목록이 비어 있으면 빈 목록이다 — 그 경우
     재탐색은 예전처럼 전부 다시 뽑는다.
     """
     req = state["request"]
-    if req.stage != "mode1" or not req.places:
+    if req.stage != "reexplore" or not req.places:
         return []
     return _places_from_selected(req.places, _num_days(req))
 
@@ -2232,7 +2232,7 @@ async def fit_time_budget(state: AgentState) -> AgentState:
     # 수동으로 정한 방문지를 시간에 맞춘다는 이유로 몰래 삭제하지 않는다.
     request = state["request"]
     if request.stage == "route" or (
-        request.stage == "mode1" and request.places and "pinned_content_ids" not in state
+        request.stage == "reexplore" and request.places and "pinned_content_ids" not in state
     ):
         state["timeline_status"] = "unverified"
         state["error"] = "selected places exceed the activity time budget"

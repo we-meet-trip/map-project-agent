@@ -81,7 +81,7 @@ def test_backward_compatible_defaults() -> None:
 
 def test_exclude_filters_candidates() -> None:
     """exclude 의 content_id 후보가 제거되고 나머지는 유지된다."""
-    req = _request(stage="mode1", exclude=["c1", "c3"])
+    req = _request(stage="reexplore", exclude=["c1", "c3"])
     out = _run_search(
         req, [_candidate("c1"), _candidate("c2"), _candidate("c3")]
     )
@@ -91,14 +91,14 @@ def test_exclude_filters_candidates() -> None:
 
 def test_exclude_keeps_candidates_without_content_id() -> None:
     """content_id 없는 후보는 대조 불가라 통과된다."""
-    req = _request(stage="mode1", exclude=["c1"])
+    req = _request(stage="reexplore", exclude=["c1"])
     out = _run_search(req, [_candidate("c1"), _candidate(None)])
     assert [c["content_id"] for c in out["candidates"]] == [None]
 
 
 def test_exclude_all_degrades_to_invent_path() -> None:
     """전량 제외 시 기존 저하 규칙(grounded=False)로 폴백한다."""
-    req = _request(stage="mode1", exclude=["c1", "c2"])
+    req = _request(stage="reexplore", exclude=["c1", "c2"])
     out = _run_search(req, [_candidate("c1"), _candidate("c2")])
     assert out["grounded"] is False
     assert out["candidates"] == []

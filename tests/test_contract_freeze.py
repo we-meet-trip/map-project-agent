@@ -77,7 +77,7 @@ GOLDEN: dict[str, dict[str, str]] = {
         "province": "str|req",
         "city": "str|req",
         "schedule_id": "Optional[str]|opt",
-        "stage": "Literal[init,mode1,route]|opt",
+        "stage": "Literal[init,reexplore,route]|opt",
         "optimize": "bool|opt",
         "exclude": "Optional[list[str]]|opt",
         "places": "Optional[list[SelectedPlace]]|opt",

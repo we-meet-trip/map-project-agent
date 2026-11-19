@@ -199,17 +199,17 @@ class AgentRequest(BaseModel):
                  않으므로 이 값으로 조회하지 않는다. nullable.
     stage: 추천 단계.
            "init"  — 조건만 받아 장소 탐색부터 하는 초기 추천.
-           "mode1" — 일부 장소를 빼고 다시 뽑는 재탐색.
+           "reexplore" — 일부 장소를 빼고 다시 뽑는 재탐색.
            "route" — 사용자가 places 로 고른 장소들의 동선만 짠다.
            기본 "init" — 기존 호출자 하위호환.
-    exclude: Mode 1 재탐색 시 재추천을 금지할 content_id 목록.
+    exclude: 재탐색(reexplore) 시 재추천을 금지할 content_id 목록.
              grounded 후보 필터에 사용된다. invent(LLM 생성) 폴백에는
              content_id 가 없어 적용 불가 — 한계는 search_places docstring 참조.
     places: 사용자가 지목한 방문지 목록. 1~10개.
             stage="route" 에서는 이 목록이 일정 전부다(동선만 짠다).
-            stage="mode1" 에서는 "이건 그대로 두라"는 뜻이라, 이 장소들은
+            stage="reexplore" 에서는 "이건 그대로 두라"는 뜻이라, 이 장소들은
             고정해 두고 나머지 자리만 다시 뽑는다. init 에서는 무시된다.
-            하한이 1인 이유는 mode1 에서 한 곳만 남기는 것도 정상 요청이기
+            하한이 1인 이유는 reexplore 에서 한 곳만 남기는 것도 정상 요청이기
             때문이다 — route 의 2개 하한은 parse_input 이 따로 지킨다.
             10개를 넘으면 동선 프롬프트가 감당하기 어려워 상한을 둔다.
 
@@ -225,7 +225,7 @@ class AgentRequest(BaseModel):
     province: str = Field(min_length=1, max_length=20)
     city: str = Field(min_length=1, max_length=20)
     schedule_id: Optional[str] = Field(default=None, max_length=64)
-    stage: Literal["init", "mode1", "route"] = "init"
+    stage: Literal["init", "reexplore", "route"] = "init"
     # route 요청은 사용자가 고른 순서가 기본이다. 명시 요청에만 최적화한다.
     optimize: bool = False
     exclude: Optional[

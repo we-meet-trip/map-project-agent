@@ -171,7 +171,7 @@ def test_places_require_two_to_ten() -> None:
 
     1개 하한은 스키마가 아니라 parse_input 이 지킨다 — 재탐색은 한 곳만
     남기는 요청이 정상이라 스키마 하한을 1로 내렸기 때문이다
-    (tests/test_mode1_keep.py 참조).
+    (tests/test_reexplore_keep.py 참조).
     """
     one = AgentRequest(
         date=DateRange(

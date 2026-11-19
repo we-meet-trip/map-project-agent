@@ -1,4 +1,4 @@
-"""재탐색에서 남길 장소(stage=mode1 + places) 고정·병합 테스트."""
+"""재탐색에서 남길 장소(stage=reexplore + places) 고정·병합 테스트."""
 from __future__ import annotations
 
 import asyncio
@@ -95,7 +95,7 @@ def verified_search_results():
 
 def test_places_lower_bound_allows_single_keep() -> None:
     """남길 곳이 한 군데뿐인 재탐색도 정상 요청이다."""
-    req = _request(stage="mode1", places=[_selected("A", "c1")])
+    req = _request(stage="reexplore", places=[_selected("A", "c1")])
     assert len(req.places) == 1
 
 
@@ -111,17 +111,17 @@ def test_route_still_requires_two_places() -> None:
     assert asyncio.run(parse_input(_state(ok))).get("error") is None
 
 
-def test_pinned_only_for_mode1_with_places() -> None:
+def test_pinned_only_for_reexplore_with_places() -> None:
     """init/route 요청은 남길 장소로 보지 않는다."""
     keep = [_selected("A", "c1")]
-    assert _pinned_places(_state(_request(stage="mode1", places=keep)))
+    assert _pinned_places(_state(_request(stage="reexplore", places=keep)))
     assert not _pinned_places(_state(_request(stage="init")))
-    assert not _pinned_places(_state(_request(stage="mode1")))
+    assert not _pinned_places(_state(_request(stage="reexplore")))
 
 
 def test_remaining_targets_reduces_plan_by_pinned_count() -> None:
     """남길 장소 수만큼 그날 뽑을 수를 줄인다 — 안 줄이면 일정이 부푼다."""
-    state = _state(_request(stage="mode1"), targets=[4, 4])
+    state = _state(_request(stage="reexplore"), targets=[4, 4])
     pinned = [
         _place(0, "A", "c1", day=1),
         _place(1, "B", "c2", day=1),
@@ -134,7 +134,7 @@ def test_remaining_targets_reduces_plan_by_pinned_count() -> None:
 
 def test_remaining_targets_false_when_pins_fill_every_day() -> None:
     """남길 장소가 그날 몫을 채우면 더 뽑을 자리가 없다."""
-    state = _state(_request(stage="mode1"), targets=[2])
+    state = _state(_request(stage="reexplore"), targets=[2])
     pinned = [_place(0, "A", "c1"), _place(1, "B", "c2")]
 
     assert _remaining_targets(state, pinned) is False
@@ -144,7 +144,7 @@ def test_remaining_targets_false_when_pins_fill_every_day() -> None:
 def test_recommend_places_skips_llm_when_pins_fill_plan() -> None:
     """더 뽑을 자리가 없으면 모델을 부르지 않고 남길 장소만 세운다."""
     req = _request(
-        stage="mode1",
+        stage="reexplore",
         places=[_selected("A", "c1"), _selected("B", "c2")],
     )
     state = _state(req, targets=[2])
@@ -177,7 +177,7 @@ def test_merge_pinned_dedupes_sorts_and_renumbers() -> None:
 def test_contract_bounds_unchanged_for_upper_limit() -> None:
     """상한 10개는 그대로다."""
     with pytest.raises(ValidationError):
-        _request(stage="mode1", places=[_selected("A", "c1")] * 11)
+        _request(stage="reexplore", places=[_selected("A", "c1")] * 11)
 
 
 class _FakeGemini:
@@ -212,7 +212,7 @@ def test_recommend_places_merges_pins_with_selection() -> None:
     번호는 0..N-1 로 다시 매겨져야 한다 — 동선 노드가 이 번호로 장소를
     지목하므로 빈 번호나 중복이 있으면 그 검증에 걸린다.
     """
-    req = _request(stage="mode1", places=[_selected("남길곳", "kakao:1")])
+    req = _request(stage="reexplore", places=[_selected("남길곳", "kakao:1")])
     state = _state(req, targets=[3])
     state["candidates"] = [_candidate(7), _candidate(8)]
     state["grounded"] = True
