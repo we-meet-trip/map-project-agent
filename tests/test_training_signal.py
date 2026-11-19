@@ -326,6 +326,7 @@ class TestRequestAndConfig:
 
         assert signal["candidates"][0]["category_group_code"] == "CE7"
 
-    def test_계약판이_2다(self):
-        # 읽는 쪽이 판을 보고 갈라 읽는다. 필드를 더했으면 판도 올라가야 한다.
-        assert TRAINING_SCHEMA_VERSION == 2
+    def test_계약판은_판_표기_문자열이다(self):
+        # 읽는 쪽이 판을 보고 갈라 읽는다. BFF 는 정수와 판 표기 문자열을 모두
+        # 받으며, 공개본의 판은 1.0.0 이다.
+        assert TRAINING_SCHEMA_VERSION == "1.0.0"

@@ -2444,10 +2444,10 @@ async def build_payload(state: AgentState) -> AgentState:
 
 # 학습 신호 계약의 판. 소비하는 쪽이 형태를 보고 갈라 읽을 수 있게 함께 싣는다.
 #
-# 2: 요청 조건(request)·랭킹 설정(ranking_config)·후보의 분류 코드를 더했다.
-#    앞의 둘이 없으면 "무엇을 물었을 때 무엇이 뽑혔는가" 가 성립하지 않고,
-#    코드가 없으면 그 잡의 랭킹을 나중에 다시 돌려볼 수 없다.
-TRAINING_SCHEMA_VERSION = 2
+# 신호에는 요청 조건(request)·랭킹 설정(ranking_config)·후보의 분류 코드가
+# 함께 실린다. 앞의 둘이 없으면 "무엇을 물었을 때 무엇이 뽑혔는가" 가 성립하지
+# 않고, 코드가 없으면 그 잡의 랭킹을 나중에 다시 돌려볼 수 없다.
+TRAINING_SCHEMA_VERSION = "1.0.0"
 
 
 def _training_signal(state: AgentState) -> str | None:
