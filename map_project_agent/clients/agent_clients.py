@@ -81,6 +81,18 @@ def _is_truncated(resp) -> bool:
     return "MAX_TOKENS" in name
 
 
+# hub 룰 엔드포인트(반경 필터·실내 가점·체류시간)가 한 번에 받는 항목 수 상한.
+# 길이 간극은 보내는 쪽이 지킨다 — 넘으면 hub 가 거절하고 룰이 조용히 빠진다.
+HUB_RULES_MAX_ITEMS = 100
+
+
+def _chunks(items: list) -> list[list]:
+    """HUB_RULES_MAX_ITEMS 개씩 나눈다. 빈 목록이면 빈 묶음 하나(요청 1회)."""
+    if not items:
+        return [items]
+    return [items[i:i + HUB_RULES_MAX_ITEMS] for i in range(0, len(items), HUB_RULES_MAX_ITEMS)]
+
+
 class HubClient:
     """hub `/v1/weather`·`/v1/places`·`/v1/reviews`·`/v1/rules/*` 호출 클라이언트.
 
@@ -215,7 +227,7 @@ class HubClient:
 
         인자(전부 JSON body 로 전달):
           origin: 후보 중심 좌표 `{"lat", "lng"}`.
-          mobility: 이동수단 문자열(walk/bicycle/car/transit).
+          mobility: 이동수단 문자열(walk/bicycle/scooter/car/transit).
           candidates: 필터 대상 후보 dict 리스트(원본 그대로 전달).
 
         실패 시:
@@ -227,17 +239,27 @@ class HubClient:
         """
         # 좌표는 감싸서 보낸다. 출발지와 후보 모두 좌표를 담고 있어, 값
         # 그대로 실으면 요청 본문과 중간에 남는 기록에 그대로 드러난다.
-        body = {
-            "mobility": mobility,
-            "loc": location_seal.seal(
-                {"origin": origin, "candidates": candidates}
-            ),
-        }
-        r = await self._client.post(
-            f"{self._base}/v1/rules/filter/mobility-radius", json=body
-        )
-        r.raise_for_status()
-        return r.json()
+        # hub 는 한 번에 HUB_RULES_MAX_ITEMS 개까지 받으므로 나눠 보내고 합친다.
+        # 반경 판정은 후보마다 따로라 나눠도 결과가 같다.
+        filtered: list = []
+        dropped = 0
+        radius_m = None
+        for chunk in _chunks(candidates):
+            body = {
+                "mobility": mobility,
+                "loc": location_seal.seal(
+                    {"origin": origin, "candidates": chunk}
+                ),
+            }
+            r = await self._client.post(
+                f"{self._base}/v1/rules/filter/mobility-radius", json=body
+            )
+            r.raise_for_status()
+            part = r.json()
+            filtered.extend(part.get("filtered") or [])
+            dropped += int(part.get("dropped") or 0)
+            radius_m = part.get("radius_m", radius_m)
+        return {"filtered": filtered, "radius_m": radius_m, "dropped": dropped}
 
     async def score_indoor_bonus(
         self,
@@ -257,12 +279,17 @@ class HubClient:
         반환: hub 응답 본문 dict. scored(`{content_id, score}` 리스트) 키.
         호출처: `agent_nodes.score_and_rank` 노드(예외는 저하로 흡수).
         """
-        body = {"pois": pois, "day_pop_max": day_pop_max}
-        r = await self._client.post(
-            f"{self._base}/v1/rules/score/indoor-bonus", json=body
-        )
-        r.raise_for_status()
-        return r.json()
+        # hub 상한(HUB_RULES_MAX_ITEMS)을 넘지 않게 나눠 보낸다. 가점은 장소마다
+        # 따로 정해져 나눠도 결과가 같다.
+        scored: list = []
+        for chunk in _chunks(pois):
+            body = {"pois": chunk, "day_pop_max": day_pop_max}
+            r = await self._client.post(
+                f"{self._base}/v1/rules/score/indoor-bonus", json=body
+            )
+            r.raise_for_status()
+            scored.extend(r.json().get("scored") or [])
+        return {"scored": scored}
 
     async def estimate_dwell(self, places: list[dict]) -> dict:
         """hub `POST /v1/rules/estimate/dwell` 로 장소별 체류시간을 받는다.
@@ -279,12 +306,17 @@ class HubClient:
         source}` 리스트) 키.
         호출처: `agent_nodes.build_timeline` 노드(예외는 저하로 흡수).
         """
-        body = {"places": places}
-        r = await self._client.post(
-            f"{self._base}/v1/rules/estimate/dwell", json=body
-        )
-        r.raise_for_status()
-        return r.json()
+        # hub 상한(HUB_RULES_MAX_ITEMS)을 넘지 않게 나눠 보낸다. 체류시간은
+        # 장소마다 따로 정해져 나눠도 결과가 같다.
+        estimates: list = []
+        for chunk in _chunks(places):
+            body = {"places": chunk}
+            r = await self._client.post(
+                f"{self._base}/v1/rules/estimate/dwell", json=body
+            )
+            r.raise_for_status()
+            estimates.extend(r.json().get("estimates") or [])
+        return {"estimates": estimates}
 
     async def aclose(self) -> None:
         """내부 `httpx.AsyncClient` 를 닫는다.
