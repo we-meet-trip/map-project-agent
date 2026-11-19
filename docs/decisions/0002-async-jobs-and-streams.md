@@ -20,4 +20,4 @@ agent 에는 잡 조회 경로가 없다. 발행 DB 번호를 BFF 와 맞춰야 
 
 ## 관련 커밋
 
-{{commit:8861448}}
+[`57ffd16`](https://github.com/we-meet-trip/map-project-agent/commit/57ffd161ac93d970e331e0c1c0b8696558076aca)

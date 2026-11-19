@@ -19,4 +19,4 @@ Gemini 제공자를 고를 때만 의미가 있다. 기본 제공자는 합성�
 
 ## 관련 커밋
 
-{{commit:59be3fa}}
+[`b33117e`](https://github.com/we-meet-trip/map-project-agent/commit/b33117e89dde5eda5f237f3bfdc60dfd1b53a95d)

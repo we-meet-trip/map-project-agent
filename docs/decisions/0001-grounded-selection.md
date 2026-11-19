@@ -20,4 +20,4 @@ LLM 에게 지역과 조건만 주면 그럴듯하지만 존재하지 않는 장
 
 ## 관련 커밋
 
-{{commit:a1e1939}}, {{commit:e7e772a}}, {{commit:f4713d1}}
+[`633d69d`](https://github.com/we-meet-trip/map-project-agent/commit/633d69ddd0f3704af871b93bf3655f4e6964c38c), [`7668afd`](https://github.com/we-meet-trip/map-project-agent/commit/7668afdc05ec89f0f2af5a207a6e4780c1ee1cf3), [`d4dad3d`](https://github.com/we-meet-trip/map-project-agent/commit/d4dad3dd9a7fa358111d34fb57115b9af3872665)

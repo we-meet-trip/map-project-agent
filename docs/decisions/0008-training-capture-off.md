@@ -19,4 +19,4 @@
 
 ## 관련 커밋
 
-{{commit:f4713d1}}
+[`d4dad3d`](https://github.com/we-meet-trip/map-project-agent/commit/d4dad3dd9a7fa358111d34fb57115b9af3872665)

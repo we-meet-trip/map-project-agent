@@ -20,4 +20,4 @@
 
 ## 관련 커밋
 
-{{commit:7b848b2}}, {{commit:47e43ca}}, {{commit:a9768cc}}, {{commit:75d3c20}}
+[`5e80dcf`](https://github.com/we-meet-trip/map-project-agent/commit/5e80dcfadc6d0ac638a3ccb15512e7876fa5c40b), [`298d06c`](https://github.com/we-meet-trip/map-project-agent/commit/298d06cc12b914417af9c96c7ba0b3b55f8345ca), [`ca65896`](https://github.com/we-meet-trip/map-project-agent/commit/ca65896107df2f30f96008705963208c8613d938), [`34d3dfc`](https://github.com/we-meet-trip/map-project-agent/commit/34d3dfc7cce162aee62899e4e20c54360a320be8)

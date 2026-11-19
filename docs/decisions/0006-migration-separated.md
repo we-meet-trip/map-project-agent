@@ -19,4 +19,4 @@
 
 ## 관련 커밋
 
-{{commit:5af89f5}}, {{commit:5904b81}}
+[`27918f8`](https://github.com/we-meet-trip/map-project-agent/commit/27918f87cfe6b6c9a97cea3548d260126569fdee), [`640024d`](https://github.com/we-meet-trip/map-project-agent/commit/640024d4a977be418b92b59eb37e149fafa52456)
