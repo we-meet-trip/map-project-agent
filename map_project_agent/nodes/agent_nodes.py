@@ -1551,6 +1551,21 @@ def _cap_candidates(candidates: list[dict], limit: int) -> list[dict]:
     return [candidates[i] for i in keep]
 
 
+def _is_accepted_source(c: dict) -> bool:
+    """후보의 출처를 받을 수 있는지 본다.
+
+    출처는 실측 공급자(kakao·durunubi)여야 한다. hub 시험 모드의 스텁 후보
+    (content_id 에 stub 이 든 것)는 합성 LLM 제공자로 도는 빠른 시작에서만
+    받는다 — 그 결과는 문장마다 [합성] 표시가 붙어 실제 추천과 섞이지 않는다.
+    실제 모델로 돌 때 스텁을 받으면 지어낸 장소와 구분되지 않으므로 거부한다.
+    """
+    if c.get("source") not in {"kakao", "durunubi"}:
+        return False
+    if "stub" in c["content_id"].lower():
+        return get_settings().LLM_PROVIDER == "fake"
+    return True
+
+
 def _place_from_candidate(
     place_id: int, c: dict, visit_time: str, day: int
 ) -> Place:
@@ -1568,7 +1583,7 @@ def _place_from_candidate(
     # 조용히 드롭되는 것을 막는다. 방문시간(LLM 출력)도 같은 이유로 정규화.
     if not isinstance(c.get("content_id"), str) or not c["content_id"].strip():
         raise ValueError("candidate has no source identifier")
-    if c.get("source") not in {"kakao", "durunubi"} or "stub" in c["content_id"].lower():
+    if not _is_accepted_source(c):
         raise ValueError("candidate is not a verified source place")
     return Place(
         place_id=place_id,

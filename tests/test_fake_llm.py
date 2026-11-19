@@ -130,3 +130,42 @@ def test_training_signal_names_the_fake_provider(monkeypatch) -> None:
     signal = json.loads(_training_signal({"selection_path": "select", "candidates": []}))
 
     assert signal["model"] == "fake"
+
+
+def _stub(i: int) -> dict:
+    return {"content_id": f"kakao:stub-{i}", "source": "kakao", "name": f"스텁 장소{i}",
+            "address": "주소", "lat": 37.5 + i * 0.001, "lng": 127.0, "category": "음식점 > 카페",
+            "category_group_code": "CE7"}
+
+
+def test_stub_candidates_are_accepted_with_fake_provider(monkeypatch) -> None:
+    """hub 시험 모드의 스텁 후보는 합성 제공자일 때만 장소가 된다."""
+    from map_project_agent.agent_settings import get_settings
+    from map_project_agent.nodes.agent_nodes import _place_from_candidate
+
+    monkeypatch.setattr(get_settings(), "LLM_PROVIDER", "fake")
+    p = _place_from_candidate(0, _stub(1), "오전", 1)
+    assert p.content_id == "kakao:stub-1"
+
+
+def test_stub_candidates_are_refused_with_real_provider(monkeypatch) -> None:
+    """실제 모델로 돌 때 스텁 후보는 지금처럼 거부한다."""
+    from map_project_agent.agent_settings import get_settings
+    from map_project_agent.nodes.agent_nodes import _place_from_candidate
+
+    monkeypatch.setattr(get_settings(), "LLM_PROVIDER", "gemini")
+    with pytest.raises(ValueError):
+        _place_from_candidate(0, _stub(1), "오전", 1)
+
+
+def test_quick_start_runs_on_hub_stub_candidates(monkeypatch) -> None:
+    """빠른 시작 그대로(합성 제공자 + hub 스텁 후보)에서 추천이 끝까지 돈다."""
+    from map_project_agent.agent_settings import get_settings
+
+    monkeypatch.setattr(get_settings(), "LLM_PROVIDER", "fake")
+    out, pub = _invoke(_request(), _FakeHub([_stub(i) for i in range(4)]), FakeLLMClient())
+
+    payload = pub.payloads[-1]
+    assert payload["status"] == "done", payload
+    assert {p["content_id"] for p in payload["places"]} <= {f"kakao:stub-{i}" for i in range(4)}
+    assert all(p["reason"].startswith(SYNTHETIC_MARK) for p in payload["places"])
