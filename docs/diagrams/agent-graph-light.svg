@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Title: agent_graph Pages: 1 -->
+<svg width="569pt" height="1114pt"
+ viewBox="0.00 0.00 569.00 1114.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(21.6 1092.89)">
+<title>agent_graph</title>
+<polygon fill="#ffffff" stroke="none" points="-21.6,21.6 -21.6,-1092.89 547.6,-1092.89 547.6,21.6 -21.6,21.6"/>
+<text xml:space="preserve" text-anchor="middle" x="263" y="-1052.09" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="16.00" fill="#1f2328">추천 파이프라인 (LangGraph StateGraph)</text>
+<!-- start -->
+<g id="node1" class="node">
+<title>start</title>
+<ellipse fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" cx="441" cy="-1025.04" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-1022.12" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="9.00" fill="#1f2328">START</text>
+</g>
+<!-- parse_input -->
+<g id="node3" class="node">
+<title>parse_input</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M481.71,-977.04C481.71,-977.04 400.29,-977.04 400.29,-977.04 394.29,-977.04 388.29,-971.04 388.29,-965.04 388.29,-965.04 388.29,-948.96 388.29,-948.96 388.29,-942.96 394.29,-936.96 400.29,-936.96 400.29,-936.96 481.71,-936.96 481.71,-936.96 487.71,-936.96 493.71,-942.96 493.71,-948.96 493.71,-948.96 493.71,-965.04 493.71,-965.04 493.71,-971.04 487.71,-977.04 481.71,-977.04"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-960.6" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">parse_input</text>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-945.6" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">요청 검증·정규화</text>
+</g>
+<!-- start&#45;&gt;parse_input -->
+<g id="edge1" class="edge">
+<title>start&#45;&gt;parse_input</title>
+<path fill="none" stroke="#57606a" d="M441,-1006.69C441,-1000.21 441,-992.68 441,-985.5"/>
+<polygon fill="#57606a" stroke="#57606a" points="443.45,-985.84 441,-978.84 438.55,-985.84 443.45,-985.84"/>
+</g>
+<!-- end -->
+<g id="node2" class="node">
+<title>end</title>
+<ellipse fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" cx="328" cy="-18" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="328" y="-15.07" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="9.00" fill="#1f2328">END</text>
+</g>
+<!-- fetch_weather -->
+<g id="node4" class="node">
+<title>fetch_weather</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M433.46,-906.96C433.46,-906.96 344.54,-906.96 344.54,-906.96 338.54,-906.96 332.54,-900.96 332.54,-894.96 332.54,-894.96 332.54,-878.88 332.54,-878.88 332.54,-872.88 338.54,-866.88 344.54,-866.88 344.54,-866.88 433.46,-866.88 433.46,-866.88 439.46,-866.88 445.46,-872.88 445.46,-878.88 445.46,-878.88 445.46,-894.96 445.46,-894.96 445.46,-900.96 439.46,-906.96 433.46,-906.96"/>
+<text xml:space="preserve" text-anchor="middle" x="389" y="-890.52" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">fetch_weather</text>
+<text xml:space="preserve" text-anchor="middle" x="389" y="-875.52" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">hub /v1/weather</text>
+</g>
+<!-- parse_input&#45;&gt;fetch_weather -->
+<g id="edge2" class="edge">
+<title>parse_input&#45;&gt;fetch_weather</title>
+<path fill="none" stroke="#57606a" d="M426.24,-936.67C420.9,-929.69 414.79,-921.68 409.08,-914.21"/>
+<polygon fill="#57606a" stroke="#57606a" points="411.09,-912.81 404.9,-908.73 407.2,-915.78 411.09,-912.81"/>
+</g>
+<!-- build_payload -->
+<g id="node15" class="node">
+<title>build_payload</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M373.96,-176.16C373.96,-176.16 282.04,-176.16 282.04,-176.16 276.04,-176.16 270.04,-170.16 270.04,-164.16 270.04,-164.16 270.04,-148.08 270.04,-148.08 270.04,-142.08 276.04,-136.08 282.04,-136.08 282.04,-136.08 373.96,-136.08 373.96,-136.08 379.96,-136.08 385.96,-142.08 385.96,-148.08 385.96,-148.08 385.96,-164.16 385.96,-164.16 385.96,-170.16 379.96,-176.16 373.96,-176.16"/>
+<text xml:space="preserve" text-anchor="middle" x="328" y="-159.72" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">build_payload</text>
+<text xml:space="preserve" text-anchor="middle" x="328" y="-144.72" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">완료 페이로드 조립</text>
+</g>
+<!-- parse_input&#45;&gt;build_payload -->
+<g id="edge18" class="edge">
+<title>parse_input&#45;&gt;build_payload</title>
+<path fill="none" stroke="#8c959f" stroke-dasharray="1,5" d="M461.58,-936.42C486.73,-910.27 526,-861.29 526,-810.34 526,-810.34 526,-810.34 526,-295.28 526,-229.22 450.97,-192.14 393.28,-173.39"/>
+<polygon fill="#8c959f" stroke="#8c959f" points="394.13,-171.46 387.78,-171.65 392.87,-175.46 394.13,-171.46"/>
+<text xml:space="preserve" text-anchor="middle" x="468.35" y="-912.36" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="10.00" fill="#1f2328">오류</text>
+</g>
+<!-- plan_strategy -->
+<g id="node5" class="node">
+<title>plan_strategy</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M398.96,-829.38C398.96,-829.38 313.04,-829.38 313.04,-829.38 307.04,-829.38 301.04,-823.38 301.04,-817.38 301.04,-817.38 301.04,-801.3 301.04,-801.3 301.04,-795.3 307.04,-789.3 313.04,-789.3 313.04,-789.3 398.96,-789.3 398.96,-789.3 404.96,-789.3 410.96,-795.3 410.96,-801.3 410.96,-801.3 410.96,-817.38 410.96,-817.38 410.96,-823.38 404.96,-829.38 398.96,-829.38"/>
+<text xml:space="preserve" text-anchor="middle" x="356" y="-812.94" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">plan_strategy</text>
+<text xml:space="preserve" text-anchor="middle" x="356" y="-797.94" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">일차별 전략(계산)</text>
+</g>
+<!-- fetch_weather&#45;&gt;plan_strategy -->
+<g id="edge3" class="edge">
+<title>fetch_weather&#45;&gt;plan_strategy</title>
+<path fill="none" stroke="#57606a" d="M380.5,-866.46C376.65,-857.64 372.04,-847.07 367.85,-837.49"/>
+<polygon fill="#57606a" stroke="#57606a" points="370.12,-836.56 365.08,-831.12 365.63,-838.52 370.12,-836.56"/>
+<text xml:space="preserve" text-anchor="middle" x="363.48" y="-851.32" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="10.00" fill="#1f2328">기본</text>
+</g>
+<!-- load_given_places -->
+<g id="node6" class="node">
+<title>load_given_places</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M256.71,-836.88C256.71,-836.88 157.29,-836.88 157.29,-836.88 151.29,-836.88 145.29,-830.88 145.29,-824.88 145.29,-824.88 145.29,-793.8 145.29,-793.8 145.29,-787.8 151.29,-781.8 157.29,-781.8 157.29,-781.8 256.71,-781.8 256.71,-781.8 262.71,-781.8 268.71,-787.8 268.71,-793.8 268.71,-793.8 268.71,-824.88 268.71,-824.88 268.71,-830.88 262.71,-836.88 256.71,-836.88"/>
+<text xml:space="preserve" text-anchor="middle" x="207" y="-820.44" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">load_given_places</text>
+<text xml:space="preserve" text-anchor="middle" x="207" y="-805.44" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">고른 장소 출처 확인</text>
+<text xml:space="preserve" text-anchor="middle" x="207" y="-790.44" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">(stage=route)</text>
+</g>
+<!-- fetch_weather&#45;&gt;load_given_places -->
+<g id="edge4" class="edge">
+<title>fetch_weather&#45;&gt;load_given_places</title>
+<path fill="none" stroke="#57606a" d="M342.13,-866.46C322.25,-858.2 298.66,-848.41 276.81,-839.33"/>
+<polygon fill="#57606a" stroke="#57606a" points="277.96,-837.15 270.55,-836.73 276.08,-841.68 277.96,-837.15"/>
+<text xml:space="preserve" text-anchor="middle" x="278.51" y="-854.5" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="10.00" fill="#1f2328">stage=route</text>
+</g>
+<!-- fetch_weather&#45;&gt;build_payload -->
+<g id="edge19" class="edge">
+<title>fetch_weather&#45;&gt;build_payload</title>
+<path fill="none" stroke="#8c959f" stroke-dasharray="1,5" d="M406.61,-866.5C413.71,-857.9 421.5,-847.37 427,-836.88 449.55,-793.89 460,-781.3 460,-732.76 460,-732.76 460,-732.76 460,-295.28 460,-243.64 411.19,-203.71 372.93,-180.35"/>
+<polygon fill="#8c959f" stroke="#8c959f" points="374.42,-178.79 368.19,-177.52 372.27,-182.4 374.42,-178.79"/>
+</g>
+<!-- search_places -->
+<g id="node7" class="node">
+<title>search_places</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M393.21,-751.8C393.21,-751.8 314.79,-751.8 314.79,-751.8 308.79,-751.8 302.79,-745.8 302.79,-739.8 302.79,-739.8 302.79,-723.72 302.79,-723.72 302.79,-717.72 308.79,-711.72 314.79,-711.72 314.79,-711.72 393.21,-711.72 393.21,-711.72 399.21,-711.72 405.21,-717.72 405.21,-723.72 405.21,-723.72 405.21,-739.8 405.21,-739.8 405.21,-745.8 399.21,-751.8 393.21,-751.8"/>
+<text xml:space="preserve" text-anchor="middle" x="354" y="-735.36" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">search_places</text>
+<text xml:space="preserve" text-anchor="middle" x="354" y="-720.36" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">hub /v1/places</text>
+</g>
+<!-- plan_strategy&#45;&gt;search_places -->
+<g id="edge5" class="edge">
+<title>plan_strategy&#45;&gt;search_places</title>
+<path fill="none" stroke="#57606a" d="M355.48,-788.88C355.26,-780.24 354.98,-769.91 354.73,-760.49"/>
+<polygon fill="#57606a" stroke="#57606a" points="357.19,-760.6 354.55,-753.67 352.29,-760.73 357.19,-760.6"/>
+</g>
+<!-- recommend_route -->
+<g id="node11" class="node">
+<title>recommend_route</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M310.71,-456.48C310.71,-456.48 187.29,-456.48 187.29,-456.48 181.29,-456.48 175.29,-450.48 175.29,-444.48 175.29,-444.48 175.29,-428.4 175.29,-428.4 175.29,-422.4 181.29,-416.4 187.29,-416.4 187.29,-416.4 310.71,-416.4 310.71,-416.4 316.71,-416.4 322.71,-422.4 322.71,-428.4 322.71,-428.4 322.71,-444.48 322.71,-444.48 322.71,-450.48 316.71,-456.48 310.71,-456.48"/>
+<text xml:space="preserve" text-anchor="middle" x="249" y="-440.04" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">recommend_route</text>
+<text xml:space="preserve" text-anchor="middle" x="249" y="-425.04" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">방문 순서·구간(좌표 계산)</text>
+</g>
+<!-- load_given_places&#45;&gt;recommend_route -->
+<g id="edge10" class="edge">
+<title>load_given_places&#45;&gt;recommend_route</title>
+<path fill="none" stroke="#57606a" d="M209.97,-781.26C212.92,-752.04 217,-704.12 217,-662.68 217,-662.68 217,-662.68 217,-590.6 217,-545.91 230.22,-495.4 239.66,-465.01"/>
+<polygon fill="#57606a" stroke="#57606a" points="241.97,-465.85 241.75,-458.44 237.3,-464.36 241.97,-465.85"/>
+</g>
+<!-- load_given_places&#45;&gt;build_payload -->
+<g id="edge20" class="edge">
+<title>load_given_places&#45;&gt;build_payload</title>
+<path fill="none" stroke="#8c959f" stroke-dasharray="1,5" d="M144.89,-793C83.92,-773.77 0,-734.31 0,-662.68 0,-662.68 0,-662.68 0,-295.28 0,-182.52 166.69,-160.31 262.41,-156.86"/>
+<polygon fill="#8c959f" stroke="#8c959f" points="262.3,-158.96 268.23,-156.68 262.16,-154.77 262.3,-158.96"/>
+</g>
+<!-- rules_filter -->
+<g id="node8" class="node">
+<title>rules_filter</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M393.96,-681.72C393.96,-681.72 302.04,-681.72 302.04,-681.72 296.04,-681.72 290.04,-675.72 290.04,-669.72 290.04,-669.72 290.04,-653.64 290.04,-653.64 290.04,-647.64 296.04,-641.64 302.04,-641.64 302.04,-641.64 393.96,-641.64 393.96,-641.64 399.96,-641.64 405.96,-647.64 405.96,-653.64 405.96,-653.64 405.96,-669.72 405.96,-669.72 405.96,-675.72 399.96,-681.72 393.96,-681.72"/>
+<text xml:space="preserve" text-anchor="middle" x="348" y="-665.28" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">rules_filter</text>
+<text xml:space="preserve" text-anchor="middle" x="348" y="-650.28" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">이동수단 반경 필터</text>
+</g>
+<!-- search_places&#45;&gt;rules_filter -->
+<g id="edge6" class="edge">
+<title>search_places&#45;&gt;rules_filter</title>
+<path fill="none" stroke="#57606a" d="M352.3,-711.43C351.72,-704.88 351.06,-697.42 350.44,-690.35"/>
+<polygon fill="#57606a" stroke="#57606a" points="352.92,-690.56 349.86,-683.8 348.04,-690.99 352.92,-690.56"/>
+</g>
+<!-- score_and_rank -->
+<g id="node9" class="node">
+<title>score_and_rank</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M392.46,-611.64C392.46,-611.64 297.54,-611.64 297.54,-611.64 291.54,-611.64 285.54,-605.64 285.54,-599.64 285.54,-599.64 285.54,-583.56 285.54,-583.56 285.54,-577.56 291.54,-571.56 297.54,-571.56 297.54,-571.56 392.46,-571.56 392.46,-571.56 398.46,-571.56 404.46,-577.56 404.46,-583.56 404.46,-583.56 404.46,-599.64 404.46,-599.64 404.46,-605.64 398.46,-611.64 392.46,-611.64"/>
+<text xml:space="preserve" text-anchor="middle" x="345" y="-595.2" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">score_and_rank</text>
+<text xml:space="preserve" text-anchor="middle" x="345" y="-580.2" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">실내 가점·테마 가점</text>
+</g>
+<!-- rules_filter&#45;&gt;score_and_rank -->
+<g id="edge7" class="edge">
+<title>rules_filter&#45;&gt;score_and_rank</title>
+<path fill="none" stroke="#57606a" d="M347.15,-641.35C346.86,-634.8 346.53,-627.34 346.22,-620.27"/>
+<polygon fill="#57606a" stroke="#57606a" points="348.69,-620.61 345.93,-613.72 343.79,-620.82 348.69,-620.61"/>
+</g>
+<!-- recommend_places -->
+<g id="node10" class="node">
+<title>recommend_places</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M398.96,-541.56C398.96,-541.56 289.04,-541.56 289.04,-541.56 283.04,-541.56 277.04,-535.56 277.04,-529.56 277.04,-529.56 277.04,-498.48 277.04,-498.48 277.04,-492.48 283.04,-486.48 289.04,-486.48 289.04,-486.48 398.96,-486.48 398.96,-486.48 404.96,-486.48 410.96,-492.48 410.96,-498.48 410.96,-498.48 410.96,-529.56 410.96,-529.56 410.96,-535.56 404.96,-541.56 398.96,-541.56"/>
+<text xml:space="preserve" text-anchor="middle" x="344" y="-525.12" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">recommend_places</text>
+<text xml:space="preserve" text-anchor="middle" x="344" y="-510.12" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">LLM 장소 선정</text>
+<text xml:space="preserve" text-anchor="middle" x="344" y="-495.12" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">+ 후기 보강(기본 꺼짐)</text>
+</g>
+<!-- score_and_rank&#45;&gt;recommend_places -->
+<g id="edge8" class="edge">
+<title>score_and_rank&#45;&gt;recommend_places</title>
+<path fill="none" stroke="#57606a" d="M344.74,-571.14C344.66,-564.79 344.56,-557.52 344.47,-550.38"/>
+<polygon fill="#57606a" stroke="#57606a" points="346.92,-550.59 344.38,-543.62 342.02,-550.65 346.92,-550.59"/>
+</g>
+<!-- recommend_places&#45;&gt;recommend_route -->
+<g id="edge9" class="edge">
+<title>recommend_places&#45;&gt;recommend_route</title>
+<path fill="none" stroke="#57606a" d="M309.97,-485.95C300.19,-478.17 289.59,-469.73 280.01,-462.11"/>
+<polygon fill="#57606a" stroke="#57606a" points="281.74,-460.36 274.74,-457.92 278.69,-464.19 281.74,-460.36"/>
+</g>
+<!-- recommend_places&#45;&gt;build_payload -->
+<g id="edge21" class="edge">
+<title>recommend_places&#45;&gt;build_payload</title>
+<path fill="none" stroke="#8c959f" stroke-dasharray="1,5" d="M359.27,-486.05C373.98,-457.5 394,-410.67 394,-367.36 394,-367.36 394,-367.36 394,-295.28 394,-252.28 367.65,-208.46 348.25,-182.02"/>
+<polygon fill="#8c959f" stroke="#8c959f" points="350.16,-181.08 344.88,-177.54 346.8,-183.6 350.16,-181.08"/>
+</g>
+<!-- build_timeline -->
+<g id="node12" class="node">
+<title>build_timeline</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M263.71,-386.4C263.71,-386.4 134.29,-386.4 134.29,-386.4 128.29,-386.4 122.29,-380.4 122.29,-374.4 122.29,-374.4 122.29,-358.32 122.29,-358.32 122.29,-352.32 128.29,-346.32 134.29,-346.32 134.29,-346.32 263.71,-346.32 263.71,-346.32 269.71,-346.32 275.71,-352.32 275.71,-358.32 275.71,-358.32 275.71,-374.4 275.71,-374.4 275.71,-380.4 269.71,-386.4 263.71,-386.4"/>
+<text xml:space="preserve" text-anchor="middle" x="199" y="-369.96" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">build_timeline</text>
+<text xml:space="preserve" text-anchor="middle" x="199" y="-354.96" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">hub 체류시간 → 방문 시각</text>
+</g>
+<!-- recommend_route&#45;&gt;build_timeline -->
+<g id="edge11" class="edge">
+<title>recommend_route&#45;&gt;build_timeline</title>
+<path fill="none" stroke="#57606a" d="M234.81,-416.11C229.68,-409.13 223.8,-401.12 218.31,-393.65"/>
+<polygon fill="#57606a" stroke="#57606a" points="220.42,-392.38 214.3,-388.19 216.47,-395.28 220.42,-392.38"/>
+</g>
+<!-- recommend_route&#45;&gt;build_payload -->
+<g id="edge22" class="edge">
+<title>recommend_route&#45;&gt;build_payload</title>
+<path fill="none" stroke="#8c959f" stroke-dasharray="1,5" d="M270.75,-415.86C278.66,-407.55 286.91,-397.27 292,-386.4 323.75,-318.58 328.37,-228.4 328.52,-184.06"/>
+<polygon fill="#8c959f" stroke="#8c959f" points="330.62,-184.09 328.51,-178.1 326.42,-184.1 330.62,-184.09"/>
+</g>
+<!-- fit_time_budget -->
+<g id="node13" class="node">
+<title>fit_time_budget</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M267.46,-316.32C267.46,-316.32 124.54,-316.32 124.54,-316.32 118.54,-316.32 112.54,-310.32 112.54,-304.32 112.54,-304.32 112.54,-288.24 112.54,-288.24 112.54,-282.24 118.54,-276.24 124.54,-276.24 124.54,-276.24 267.46,-276.24 267.46,-276.24 273.46,-276.24 279.46,-282.24 279.46,-288.24 279.46,-288.24 279.46,-304.32 279.46,-304.32 279.46,-310.32 273.46,-316.32 267.46,-316.32"/>
+<text xml:space="preserve" text-anchor="middle" x="196" y="-299.88" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">fit_time_budget</text>
+<text xml:space="preserve" text-anchor="middle" x="196" y="-284.88" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">하루 시간 초과 시 결정적 축소</text>
+</g>
+<!-- build_timeline&#45;&gt;fit_time_budget -->
+<g id="edge12" class="edge">
+<title>build_timeline&#45;&gt;fit_time_budget</title>
+<path fill="none" stroke="#57606a" d="M198.15,-346.03C197.86,-339.48 197.53,-332.02 197.22,-324.95"/>
+<polygon fill="#57606a" stroke="#57606a" points="199.69,-325.29 196.93,-318.4 194.79,-325.5 199.69,-325.29"/>
+</g>
+<!-- llm_reason -->
+<g id="node14" class="node">
+<title>llm_reason</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M266.96,-246.24C266.96,-246.24 127.04,-246.24 127.04,-246.24 121.04,-246.24 115.04,-240.24 115.04,-234.24 115.04,-234.24 115.04,-218.16 115.04,-218.16 115.04,-212.16 121.04,-206.16 127.04,-206.16 127.04,-206.16 266.96,-206.16 266.96,-206.16 272.96,-206.16 278.96,-212.16 278.96,-218.16 278.96,-218.16 278.96,-234.24 278.96,-234.24 278.96,-240.24 272.96,-246.24 266.96,-246.24"/>
+<text xml:space="preserve" text-anchor="middle" x="197" y="-229.8" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">llm_reason</text>
+<text xml:space="preserve" text-anchor="middle" x="197" y="-214.8" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">LLM 추천 이유(실패 시 생략)</text>
+</g>
+<!-- fit_time_budget&#45;&gt;llm_reason -->
+<g id="edge13" class="edge">
+<title>fit_time_budget&#45;&gt;llm_reason</title>
+<path fill="none" stroke="#57606a" d="M196.28,-275.95C196.38,-269.4 196.49,-261.94 196.59,-254.87"/>
+<polygon fill="#57606a" stroke="#57606a" points="199.04,-255.36 196.69,-248.33 194.14,-255.29 199.04,-255.36"/>
+<text xml:space="preserve" text-anchor="middle" x="172.88" y="-264.48" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="10.00" fill="#1f2328">초기·재탐색</text>
+</g>
+<!-- fit_time_budget&#45;&gt;build_payload -->
+<g id="edge14" class="edge">
+<title>fit_time_budget&#45;&gt;build_payload</title>
+<path fill="none" stroke="#57606a" stroke-dasharray="5,2" d="M132.71,-275.85C119.35,-268.71 106.91,-259.1 99,-246.24 89.67,-231.07 87.8,-220.01 99,-206.16 119.11,-181.29 201.01,-168.46 261.15,-162.27"/>
+<polygon fill="#57606a" stroke="#57606a" points="261.25,-164.72 267.98,-161.59 260.77,-159.85 261.25,-164.72"/>
+<text xml:space="preserve" text-anchor="middle" x="106.85" y="-275.38" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="10.00" fill="#1f2328">stage=route</text>
+</g>
+<!-- llm_reason&#45;&gt;build_payload -->
+<g id="edge15" class="edge">
+<title>llm_reason&#45;&gt;build_payload</title>
+<path fill="none" stroke="#57606a" d="M234.54,-205.69C249.75,-197.79 267.44,-188.59 283.31,-180.35"/>
+<polygon fill="#57606a" stroke="#57606a" points="284.03,-182.73 289.11,-177.33 281.77,-178.38 284.03,-182.73"/>
+</g>
+<!-- publish_done -->
+<g id="node16" class="node">
+<title>publish_done</title>
+<path fill="#ddf4ff" stroke="#0969da" stroke-width="1.2" d="M411.46,-106.08C411.46,-106.08 244.54,-106.08 244.54,-106.08 238.54,-106.08 232.54,-100.08 232.54,-94.08 232.54,-94.08 232.54,-78 232.54,-78 232.54,-72 238.54,-66 244.54,-66 244.54,-66 411.46,-66 411.46,-66 417.46,-66 423.46,-72 423.46,-78 423.46,-78 423.46,-94.08 423.46,-94.08 423.46,-100.08 417.46,-106.08 411.46,-106.08"/>
+<text xml:space="preserve" text-anchor="middle" x="328" y="-89.64" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">publish_done</text>
+<text xml:space="preserve" text-anchor="middle" x="328" y="-74.64" font-family="Pretendard, 'Noto Sans KR', sans-serif" font-size="12.00" fill="#1f2328">Redis Streams agent:jobs:done</text>
+</g>
+<!-- build_payload&#45;&gt;publish_done -->
+<g id="edge16" class="edge">
+<title>build_payload&#45;&gt;publish_done</title>
+<path fill="none" stroke="#57606a" d="M328,-135.79C328,-129.24 328,-121.78 328,-114.71"/>
+<polygon fill="#57606a" stroke="#57606a" points="330.45,-115.17 328,-108.17 325.55,-115.17 330.45,-115.17"/>
+</g>
+<!-- publish_done&#45;&gt;end -->
+<g id="edge17" class="edge">
+<title>publish_done&#45;&gt;end</title>
+<path fill="none" stroke="#57606a" d="M328,-65.58C328,-59.06 328,-51.67 328,-44.74"/>
+<polygon fill="#57606a" stroke="#57606a" points="330.45,-44.81 328,-37.81 325.55,-44.81 330.45,-44.81"/>
+</g>
+</g>
+</svg>

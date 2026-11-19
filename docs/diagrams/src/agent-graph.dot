@@ -1,0 +1,55 @@
+// 추천 파이프라인 LangGraph 노드 그래프 (근거: docs/diagrams/CLAIMS.md)
+// 렌더: scripts/render_diagrams.sh 가 라이트·다크 팔레트를 바꿔 끼운다(@FG@ 등 자리표시자).
+digraph agent_graph {
+  graph [rankdir=TB, bgcolor="@BG@", fontname="Pretendard, 'Noto Sans KR', sans-serif", fontcolor="@FG@",
+         nodesep=0.45, ranksep=0.42, splines=spline, pad=0.3, label="추천 파이프라인 (LangGraph StateGraph)", labelloc=t, fontsize=16];
+  node  [shape=box, style="rounded,filled", fontname="Pretendard, 'Noto Sans KR', sans-serif", fontsize=12,
+         fillcolor="@SVC_FILL@", color="@SVC_EDGE@", fontcolor="@FG@", penwidth=1.2, margin="0.18,0.07"];
+  edge  [color="@LINE@", fontcolor="@FG@", fontname="Pretendard, 'Noto Sans KR', sans-serif", fontsize=10, arrowsize=0.7];
+
+  start [label="START", shape=circle, width=0.5, fixedsize=true, fontsize=9];
+  end   [label="END",   shape=circle, width=0.5, fixedsize=true, fontsize=9];
+
+  parse_input       [label="parse_input\n요청 검증·정규화"];
+  fetch_weather     [label="fetch_weather\nhub /v1/weather"];
+  plan_strategy     [label="plan_strategy\n일차별 전략(계산)"];
+  load_given_places [label="load_given_places\n고른 장소 출처 확인\n(stage=route)"];
+  search_places     [label="search_places\nhub /v1/places"];
+  rules_filter      [label="rules_filter\n이동수단 반경 필터"];
+  score_and_rank    [label="score_and_rank\n실내 가점·테마 가점"];
+  recommend_places  [label="recommend_places\nLLM 장소 선정\n+ 후기 보강(기본 꺼짐)"];
+  recommend_route   [label="recommend_route\n방문 순서·구간(좌표 계산)"];
+  build_timeline    [label="build_timeline\nhub 체류시간 → 방문 시각"];
+  fit_time_budget   [label="fit_time_budget\n하루 시간 초과 시 결정적 축소"];
+  llm_reason        [label="llm_reason\nLLM 추천 이유(실패 시 생략)"];
+  build_payload     [label="build_payload\n완료 페이로드 조립"];
+  publish_done      [label="publish_done\nRedis Streams agent:jobs:done"];
+
+  start -> parse_input;
+  parse_input -> fetch_weather;
+  fetch_weather -> plan_strategy [xlabel="기본"];
+  fetch_weather -> load_given_places [xlabel="stage=route"];
+  plan_strategy -> search_places;
+  search_places -> rules_filter;
+  rules_filter -> score_and_rank;
+  score_and_rank -> recommend_places;
+  recommend_places -> recommend_route;
+  load_given_places -> recommend_route;
+  recommend_route -> build_timeline;
+  build_timeline -> fit_time_budget;
+  fit_time_budget -> llm_reason [xlabel="초기·재탐색"];
+  fit_time_budget -> build_payload [taillabel="stage=route", labeldistance=2.6, labelangle=-35, style=dashed];
+  llm_reason -> build_payload;
+  build_payload -> publish_done;
+  publish_done -> end;
+
+  // 오류 단축: state["error"] 가 서면 곧장 build_payload 로 간다
+  edge [style=dotted, color="@MUTED@", arrowsize=0.6];
+  parse_input -> build_payload [taillabel="오류", labeldistance=2.2];
+  fetch_weather -> build_payload;
+  load_given_places -> build_payload;
+  recommend_places -> build_payload;
+  recommend_route -> build_payload;
+
+  { rank=same; plan_strategy; load_given_places; }
+}

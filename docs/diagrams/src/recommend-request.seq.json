@@ -1,0 +1,143 @@
+{
+  "title": "추천 요청 흐름 (202 + job_id → Redis Streams)",
+  "lanes": [
+    {
+      "id": "bff",
+      "label": "BFF",
+      "sub": "map-project-user"
+    },
+    {
+      "id": "api",
+      "label": "agent API",
+      "sub": "FastAPI"
+    },
+    {
+      "id": "graph",
+      "label": "LangGraph",
+      "sub": "백그라운드 잡"
+    },
+    {
+      "id": "hub",
+      "label": "hub",
+      "sub": "map-project-hub"
+    },
+    {
+      "id": "llm",
+      "label": "LLM 제공자",
+      "sub": "합성(기본) · Gemini(선택)"
+    },
+    {
+      "id": "redis",
+      "label": "Redis Streams",
+      "sub": "DB2"
+    }
+  ],
+  "steps": [
+    {
+      "kind": "band",
+      "text": "① 접수"
+    },
+    {
+      "kind": "call",
+      "from": "bff",
+      "to": "api",
+      "text": "POST /v1/recommend (X-Internal-Token)"
+    },
+    {
+      "kind": "self",
+      "from": "api",
+      "text": "토큰 검증 · job_id 발급 · 잡 시작"
+    },
+    {
+      "kind": "ret",
+      "from": "api",
+      "to": "bff",
+      "text": "202 Accepted + job_id"
+    },
+    {
+      "kind": "band",
+      "text": "② 실행 (노드마다 진행 이벤트)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "redis",
+      "text": "XADD agent:jobs:status (stage)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "GET /v1/weather"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "GET /v1/places (테마별)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "POST 반경 필터 (좌표는 봉투)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "POST 실내 가점 (/v1/rules/score/…)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "GET /v1/reviews (후기 보강을 켰을 때, 상위 후보만)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "llm",
+      "text": "장소 선정 (구조화 출력)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "GET /v1/places (선정 장소 출처 확인)"
+    },
+    {
+      "kind": "self",
+      "from": "graph",
+      "text": "방문 순서·구간 계산 (모델 호출 없음)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "hub",
+      "text": "POST 체류시간 (/v1/rules/estimate/…)"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "llm",
+      "text": "추천 이유 (실패 시 생략)"
+    },
+    {
+      "kind": "band",
+      "text": "③ 결과"
+    },
+    {
+      "kind": "call",
+      "from": "graph",
+      "to": "redis",
+      "text": "XADD agent:jobs:done (payload 는 봉투)"
+    },
+    {
+      "kind": "call",
+      "from": "bff",
+      "to": "redis",
+      "text": "컨슈머 그룹으로 결과 읽기"
+    }
+  ]
+}
