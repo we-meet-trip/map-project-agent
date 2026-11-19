@@ -81,7 +81,7 @@ GOLDEN: dict[str, dict[str, str]] = {
         "optimize": "bool|opt",
         "exclude": "Optional[list[str]]|opt",
         "places": "Optional[list[SelectedPlace]]|opt",
-        # 감싼 장소가 들어오는 자리. 열쇠가 설정되면 이쪽만 받는다.
+        # 감싼 장소가 들어오는 자리. 고른 장소는 이쪽으로만 받는다.
         "loc": "Optional[str]|opt",
     },
     # AgentRequest.date 중첩

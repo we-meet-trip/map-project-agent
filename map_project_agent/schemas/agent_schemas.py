@@ -236,7 +236,7 @@ class AgentRequest(BaseModel):
     )
     # 고른 장소를 감싸서 보낼 때 쓰는 자리. 좌표와 함께 장소 이름도 들어가는데,
     # 이름만으로도 어디를 다니는지가 드러나므로 함께 감싼다.
-    # 열쇠가 설정돼 있으면 이쪽만 받고 위 places 는 무시한다.
+    # 고른 장소는 이 봉투로만 받는다. 평문 places 만 오면 거부한다.
     loc: Optional[str] = Field(default=None, max_length=8192)
 
     @field_validator("stage", mode="before")
