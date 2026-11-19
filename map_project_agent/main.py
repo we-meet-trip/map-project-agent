@@ -56,6 +56,7 @@ from map_project_agent.clients.agent_clients import (
 )
 from map_project_agent.graph.agent_graph import build_graph
 from map_project_agent.graph.summary_graph import SUMMARY_GRAPH
+from map_project_agent.llm.fake_client import FakeLLMClient
 from map_project_agent.llm.rate_limit import GeminiQuotaError, GeminiRateLimiter
 from map_project_agent.llm.structured_call import LLMBudgetExceeded
 from map_project_agent.schemas.agent_schemas import (
@@ -108,20 +109,53 @@ def _configure_logging(level: str) -> None:
     )
 
 
+def _gemini_clients(settings) -> tuple[GeminiClient, GeminiRateLimiter]:
+    """Gemini 제공자와 그 호출 한도기를 만든다(제공자가 gemini 일 때만).
+
+    한도기는 GeminiClient 가 generate 직전 acquire() 로 소비하며, RPM/RPD 를
+    넘기면 GeminiQuotaError 로 잡이 실패 페이로드(gemini_rpm_exceeded /
+    gemini_rpd_exceeded)를 낸다.
+    """
+    limiter = GeminiRateLimiter(
+        redis_url=settings.REDIS_URL,
+        db=settings.REDIS_DB_RATELIMIT,
+        capacity=settings.GEMINI_RPM_LIMIT,
+        refill_per_min=settings.GEMINI_RPM_LIMIT,
+        daily_cap=settings.GEMINI_RPD_CAP,
+    )
+    client = GeminiClient(
+        api_key=settings.GEMINI_API_KEY.get_secret_value(),
+        model=settings.GEMINI_MODEL,
+        timeout=settings.GEMINI_TIMEOUT_SECONDS,
+        temperature=settings.GEMINI_TEMPERATURE,
+        max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
+        thinking_budget=settings.GEMINI_THINKING_BUDGET,
+        retry_attempts=settings.GEMINI_RETRY_ATTEMPTS,
+        retry_initial_delay=settings.GEMINI_RETRY_INITIAL_DELAY,
+        retry_max_delay=settings.GEMINI_RETRY_MAX_DELAY,
+        retry_status_codes=settings.GEMINI_RETRY_STATUS_CODES,
+        http_timeout_seconds=settings.GEMINI_HTTP_TIMEOUT_SECONDS,
+        limiter=limiter,
+    )
+    return client, limiter
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """FastAPI lifespan — 시작 시 외부 클라이언트 및 그래프 준비, 종료 시 정리.
 
     동작:
       - `_configure_logging(LOG_LEVEL)` 로 루트 로거를 가장 먼저 세운다.
-      - `get_settings()` 로 환경설정을 읽고, `GEMINI_API_KEY` 가 비어 있으면
-        `RuntimeError("GEMINI_API_KEY is required")` 로 즉시 실패.
+      - `get_settings()` 로 환경설정을 읽는다. 제공자가 gemini 인데
+        `GEMINI_API_KEY` 가 비어 있으면 `RuntimeError` 로 즉시 실패한다.
+        기본 제공자 fake 는 키·네트워크 없이 도는 합성 제공자다.
+      - 좌표 봉투 열쇠가 없거나 형식이 틀리면 즉시 실패한다.
       - `INTERNAL_SERVICE_TOKEN` 이 설정되어 있으면 그 SecretStr 평문 값을
         HubClient 의 `X-Internal-Token` 헤더로 전달한다(없으면 None).
       - `AUTH_ENFORCED=true` 인데 토큰이 비어 있으면
         `RuntimeError("AUTH_ENFORCED=true requires INTERNAL_SERVICE_TOKEN")`
         로 부팅 중단(fail-fast). false(기본)면 토큰 미설정을 허용한다.
-      - HubClient, StreamsPublisher, GeminiClient 를 만들어 모듈 전역 슬롯
+      - HubClient, StreamsPublisher, LLM 클라이언트(fake 또는 Gemini)를 만들어 모듈 전역 슬롯
         (`set_hub_client` / `set_streams_publisher` / `set_gemini_client`) 에
         주입한다. LangGraph 노드들은 함수 내부 import 와 getter 로 본 슬롯을
         참조한다(`map_project_agent/agent_dependencies.py`).
@@ -139,8 +173,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # 로깅은 다른 어떤 초기화보다 먼저 — 아래 fail-fast 게이트가 걸릴 때도
     # 원인이 stdout 에 남아야 한다.
     _configure_logging(settings.LOG_LEVEL)
-    if not settings.GEMINI_API_KEY.get_secret_value():
-        raise RuntimeError("GEMINI_API_KEY is required")
+    if settings.LLM_PROVIDER == "gemini" and not settings.GEMINI_API_KEY.get_secret_value():
+        raise RuntimeError("LLM_PROVIDER=gemini requires GEMINI_API_KEY")
     # 서비스 사이 좌표는 늘 봉투로만 오간다. 열쇠가 없거나 형식이 틀리면
     # 첫 요청에서 실패하기 전에 여기서 멈춘다.
     try:
@@ -185,34 +219,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         stream=settings.STATUS_STREAM_NAME,
         maxlen=settings.STATUS_STREAM_MAXLEN,
     )
-    # Gemini 호출 한도 집행기. GeminiClient 가 generate
-    # 직전 acquire() 로 소비하며, RPM/RPD 초과 시 GeminiQuotaError 로
-    # 잡이 실패 페이로드(gemini_rpm_exceeded / gemini_rpd_exceeded)를 낸다.
-    limiter = GeminiRateLimiter(
-        redis_url=settings.REDIS_URL,
-        db=settings.REDIS_DB_RATELIMIT,
-        capacity=settings.GEMINI_RPM_LIMIT,
-        refill_per_min=settings.GEMINI_RPM_LIMIT,
-        daily_cap=settings.GEMINI_RPD_CAP,
-    )
-    gemini = GeminiClient(
-        api_key=settings.GEMINI_API_KEY.get_secret_value(),
-        model=settings.GEMINI_MODEL,
-        timeout=settings.GEMINI_TIMEOUT_SECONDS,
-        temperature=settings.GEMINI_TEMPERATURE,
-        max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
-        thinking_budget=settings.GEMINI_THINKING_BUDGET,
-        retry_attempts=settings.GEMINI_RETRY_ATTEMPTS,
-        retry_initial_delay=settings.GEMINI_RETRY_INITIAL_DELAY,
-        retry_max_delay=settings.GEMINI_RETRY_MAX_DELAY,
-        retry_status_codes=settings.GEMINI_RETRY_STATUS_CODES,
-        http_timeout_seconds=settings.GEMINI_HTTP_TIMEOUT_SECONDS,
-        limiter=limiter,
-    )
+    # LLM 제공자. 기본은 합성(fake) — 외부 호출·비용이 없다. Gemini 는
+    # 쓰는 사람이 제공자를 gemini 로 고르고 자기 키를 넣었을 때만 부른다.
+    limiter: GeminiRateLimiter | None = None
+    if settings.LLM_PROVIDER == "fake":
+        llm = FakeLLMClient()
+        logger.info("agent: llm provider=fake (synthetic results, no external calls)")
+    else:
+        llm, limiter = _gemini_clients(settings)
     set_hub_client(hub_client)
     set_streams_publisher(streams)
     set_status_publisher(status_streams)
-    set_gemini_client(gemini)
+    set_gemini_client(llm)
 
     # LangGraph Postgres 체크포인터 (schema=langgraph).
     # CHECKPOINT_ENABLED=true 인데 연결/스키마 준비가 실패하면 부팅을
@@ -279,8 +297,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             await hub_client.aclose()
             await streams.aclose()
             await status_streams.aclose()
-            await gemini.aclose()
-            await limiter.aclose()
+            await llm.aclose()
+            if limiter is not None:
+                await limiter.aclose()
             reset_all()
             raise RuntimeError(
                 "langgraph checkpointer init failed; run the isolated migration job "
@@ -333,8 +352,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await hub_client.aclose()
         await streams.aclose()
         await status_streams.aclose()
-        await gemini.aclose()
-        await limiter.aclose()
+        await llm.aclose()
+        if limiter is not None:
+            await limiter.aclose()
         if checkpoint_pool is not None:
             await checkpoint_pool.close()
         reset_all()

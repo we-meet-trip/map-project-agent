@@ -7,6 +7,8 @@ HubClient/StreamsPublisher/GeminiClient 구성과 잡 타임아웃에 사용한�
 """
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,9 +21,15 @@ class AgentSettings(BaseSettings):
       - env_file_encoding="utf-8": .env 파일 인코딩.
       - extra="ignore": 정의되지 않은 환경 변수는 조용히 무시.
 
-    Gemini 관련:
+    LLM 제공자:
+      LLM_PROVIDER: "fake"(기본) 또는 "gemini". fake 는 키·네트워크·비용 없이
+                      도는 결정적 합성 제공자로, 결과 문장마다 [합성] 표시를
+                      붙인다(`map_project_agent/llm/fake_client.py`). gemini 는
+                      쓰는 사람이 자기 키를 넣었을 때만 고른다.
+
+    Gemini 관련(LLM_PROVIDER=gemini 일 때만 쓴다):
       GEMINI_API_KEY: 비밀값(SecretStr). 기본 빈 문자열.
-                      lifespan 진입 시 비어 있으면 RuntimeError 로 부팅 중단.
+                      제공자가 gemini 인데 비어 있으면 lifespan 이 부팅을 멈춘다.
       GEMINI_MODEL: 모델 이름 문자열. GeminiClient 생성 시 전달.
       GEMINI_RPM_LIMIT: 분당 호출 상한(외부 API 가 정한 값). token-bucket
                         용량/리필률로 사용된다.
@@ -206,6 +214,7 @@ class AgentSettings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
+    LLM_PROVIDER: Literal["fake", "gemini"] = "fake"
     GEMINI_API_KEY: SecretStr = SecretStr("")
     GEMINI_MODEL: str = "gemini-3.8-flash"
     GEMINI_RPM_LIMIT: int = 10
