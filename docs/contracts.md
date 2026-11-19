@@ -99,6 +99,6 @@
 | `GET /v1/weather` | 지역·기간 |
 | `GET /v1/places` | 지역·이동수단·검색어 |
 | `GET /v1/reviews` | 검색어·개수(후기 보강을 켰을 때만) |
-| `POST /v1/rules/filter/mobility-radius` | `{mobility, loc}` — `loc` 은 `{origin, candidates}` 봉투 |
-| `POST /v1/rules/score/indoor-bonus` | `{pois, day_pop_max}` |
-| `POST /v1/rules/estimate/dwell` | `{places}` |
+| `POST /v1/rules/filter/mobility-radius` | `{mobility, loc}` — `loc` 은 `{origin, candidates}` 봉투. 후보 최대 100(넘으면 100개씩 나눠 보내고 합친다) |
+| `POST /v1/rules/score/indoor-bonus` | `{pois, day_pop_max}`. 최대 100(넘으면 나눠 보낸다) |
+| `POST /v1/rules/estimate/dwell` | `{places}`. 최대 100(넘으면 나눠 보낸다) |

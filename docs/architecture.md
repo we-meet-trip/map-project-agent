@@ -64,7 +64,8 @@ map-project-agent 는 여행 일정 추천 엔진이다. BFF(map-project-user)�
 | Gemini 호출 1건 | 100초 | `AGENT_GEMINI_TIMEOUT_SECONDS` |
 | 잡 1건 | 300초 | `AGENT_JOB_TIMEOUT_SECONDS` |
 | 종료 시 진행 중 잡 대기 | 310초 | `AGENT_SHUTDOWN_GRACE_SECONDS` |
-| hub HTTP | 5초 | `AGENT_HUB_TIMEOUT_SECONDS` |
+| hub HTTP | 5초(hub 의 외부 장소 검색 한 건 제한과 같다 — 외부 검색이 느리면 agent 가 먼저 끊고 저하 경로로 간다) | `AGENT_HUB_TIMEOUT_SECONDS` |
+| hub 룰 요청 한 번의 항목 수 | 100(넘으면 나눠 보내고 합친다) | `HUB_RULES_MAX_ITEMS`(코드 상수) |
 | 선정 프롬프트 후보 수 | max(40, 여행일수 × 12) | `AGENT_CANDIDATES_MAX_BASE`, `AGENT_CANDIDATES_PER_DAY` |
 
 ## 보안 구성
