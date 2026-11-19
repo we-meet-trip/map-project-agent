@@ -26,7 +26,7 @@ from collections import defaultdict
 from pathlib import Path
 
 # 이 파일 형식의 판. 읽는 쪽이 보고 갈라 읽는다.
-STATS_SCHEMA_VERSION = 1
+STATS_SCHEMA_VERSION = "1.0.0"
 
 # 한 칸이 이 횟수만큼 보이지 않았으면 쓰지 않는다.
 #
