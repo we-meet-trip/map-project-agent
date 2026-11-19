@@ -43,9 +43,13 @@ class SealError(Exception):
     """감쌀 수 없다. 열쇠 설정이 잘못된 경우다."""
 
 
-def enabled() -> bool:
-    """열쇠가 있으면 감싸서 보낸다."""
-    return bool(get_settings().LOCATION_WIRE_KEY.get_secret_value())
+def check_key() -> None:
+    """열쇠가 있고 형식이 맞는지 부팅 때 확인한다. 아니면 SealError.
+
+    좌표는 늘 봉투로만 오가므로 열쇠 없이는 돌 수 없다. 첫 요청에서 터지기
+    전에 부팅을 멈춰 원인을 바로 드러낸다.
+    """
+    _key()
 
 
 def _key() -> bytes:

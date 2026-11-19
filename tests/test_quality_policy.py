@@ -91,7 +91,6 @@ def test_manual_time_overflow_keeps_selected_places():
 def test_sealed_places_revalidate_outer_count(monkeypatch, count):
     from map_project_agent.main import _resolve_places
     from map_project_agent.crypto import location_seal
-    monkeypatch.setattr(location_seal, "enabled", lambda: True)
     monkeypatch.setattr(location_seal, "open_seal", lambda _: {"places": [_selected()[0].model_dump()] * count})
     with pytest.raises(HTTPException):
         _resolve_places(_request(places=None, loc="test"))

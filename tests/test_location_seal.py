@@ -70,11 +70,112 @@ def test_url_safe_characters_only():
     assert all(c.isalnum() or c in "._-" for c in token)
 
 
-def test_disabled_without_key():
+def test_missing_key_is_refused():
+    """열쇠가 없으면 부팅 확인과 봉하기 모두 거부한다(평문으로 보내는 길은 없다)."""
     settings = get_settings()
     settings.LOCATION_WIRE_KEY = SecretStr("")
 
-    assert not location_seal.enabled()
+    with pytest.raises(location_seal.SealError):
+        location_seal.check_key()
+    with pytest.raises(location_seal.SealError):
+        location_seal.seal({"a": 1})
+
+
+def test_boot_stops_without_key(monkeypatch):
+    """열쇠가 없으면 lifespan 이 첫 요청 전에 멈추고 생성법을 알려 준다."""
+    import asyncio
+
+    from map_project_agent import main as agent_main
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "GEMINI_API_KEY", SecretStr("test"))
+    settings.LOCATION_WIRE_KEY = SecretStr("")
+
+    async def boot():
+        async with agent_main.lifespan(agent_main.app):
+            pass
+
+    with pytest.raises(RuntimeError, match="openssl rand -base64 32"):
+        asyncio.run(boot())
+
+
+def test_plaintext_places_are_refused():
+    """고른 장소가 봉투 없이 평문으로 오면 받지 않는다."""
+    from datetime import date, time
+
+    from fastapi import HTTPException
+
+    from map_project_agent.main import _resolve_places
+    from map_project_agent.schemas.agent_schemas import (
+        AgentRequest,
+        DateRange,
+        SelectedPlace,
+    )
+
+    req = AgentRequest(
+        date=DateRange(
+            date_start=date(2026, 7, 6),
+            date_end=date(2026, 7, 6),
+            time_start=time(9, 0),
+            time_end=time(18, 0),
+        ),
+        province="강원특별자치도",
+        city="속초시",
+        stage="route",
+        places=[SelectedPlace(name="속초해변", lat=38.19, lng=128.60)],
+    )
+
+    with pytest.raises(HTTPException) as err:
+        _resolve_places(req)
+    assert err.value.status_code == 400
+
+
+def test_published_payload_is_always_sealed():
+    """완료 스트림에 싣는 본문은 늘 봉투다."""
+    import asyncio
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock
+
+    from map_project_agent.clients.agent_clients import StreamsPublisher
+
+    publisher = StreamsPublisher("redis://localhost", 0, "test")
+    publisher._client = SimpleNamespace(xadd=AsyncMock(return_value="1-0"))
+    raw = '{"status":"done","places":[{"lat":38.19,"lng":128.6}]}'
+    asyncio.run(publisher.publish("job", "done", raw, None))
+
+    body = publisher._client.xadd.call_args.args[1]["payload"]
+    assert body.startswith("v1.") and "38.19" not in body
+    assert _open(body)["payload"] == raw
+
+
+def test_rules_filter_body_is_always_sealed():
+    """hub 반경 필터로 보내는 출발지·후보 좌표는 늘 봉투에 담긴다."""
+    import asyncio
+
+    from map_project_agent.clients.agent_clients import HubClient
+
+    sent = {}
+
+    class _Resp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"filtered": [], "radius_m": 0, "dropped": 0}
+
+    class _Client:
+        async def post(self, url, json):
+            sent["url"], sent["json"] = url, json
+            return _Resp()
+
+    hub = HubClient(base_url="http://hub")
+    hub._client = _Client()
+    asyncio.run(hub.filter_mobility_radius(
+        {"lat": 38.19, "lng": 128.6}, "walk", [{"content_id": "c1", "lat": 38.2, "lng": 128.61}]))
+
+    body = sent["json"]
+    assert set(body) == {"mobility", "loc"}
+    assert _open(body["loc"])["origin"] == {"lat": 38.19, "lng": 128.6}
 
 
 def test_refuses_short_key():

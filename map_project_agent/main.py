@@ -141,6 +141,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     _configure_logging(settings.LOG_LEVEL)
     if not settings.GEMINI_API_KEY.get_secret_value():
         raise RuntimeError("GEMINI_API_KEY is required")
+    # 서비스 사이 좌표는 늘 봉투로만 오간다. 열쇠가 없거나 형식이 틀리면
+    # 첫 요청에서 실패하기 전에 여기서 멈춘다.
+    try:
+        location_seal.check_key()
+    except location_seal.SealError as e:
+        raise RuntimeError(
+            f"LOCATION_WIRE_KEY is invalid ({e}); generate one with: "
+            "openssl rand -base64 32 (hub·BFF 와 같은 값)"
+        ) from None
 
     # INTERNAL_SERVICE_TOKEN 은 SecretStr | None — 평문을 1회만 꺼내
     # 아래 부팅 게이트와 HubClient 헤더에 공유한다.
@@ -511,15 +520,10 @@ async def _run_job(
 def _resolve_places(req: AgentRequest) -> AgentRequest:
     """고른 장소를 봉투에서 꺼낸다.
 
-    열쇠가 설정돼 있으면 봉투만 받는다. 평문으로 온 좌표를 그대로 받아 주면
-    봉투를 만들 수 있다는 것이 자격이 되는 구조가 무너진다 — 열쇠 없이도
-    같은 요청을 만들 수 있게 되기 때문이다.
-
-    열쇠가 없으면 예전처럼 평문을 받는다. 양쪽이 준비되기 전에 넘어가기 위한
-    자리이고, 둘 다 켜지면 이 갈래는 지나가지 않는다.
+    고른 장소는 봉투로만 받는다. 평문으로 온 좌표를 그대로 받아 주면 봉투를
+    만들 수 있다는 것이 자격이 되는 구조가 무너진다 — 열쇠 없이도 같은
+    요청을 만들 수 있게 되기 때문이다.
     """
-    if not location_seal.enabled():
-        return req
     if not req.loc:
         # 좌표가 아예 없는 요청은 그대로 간다. 첫 단계는 고른 장소가 없다.
         if not req.places:
