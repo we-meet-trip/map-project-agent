@@ -1,4 +1,4 @@
-# map-service-agent 의 런타임 의존성.
+# map-project-agent 의 런타임 의존성.
 # 각 패키지가 코드 어디에서 쓰이는지 한 줄로 정리한다.
 
 # fastapi

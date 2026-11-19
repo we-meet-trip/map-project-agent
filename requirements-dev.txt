@@ -1,4 +1,4 @@
-# map-service-agent 의 개발·테스트 전용 의존성.
+# map-project-agent 의 개발·테스트 전용 의존성.
 # 런타임 이미지에는 설치하지 않는다: pip install -r requirements.txt -r requirements-dev.txt
 
 # pytest
