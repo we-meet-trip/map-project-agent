@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "map-project-agent"
+version = "1.0.0"
+description = "MAP 여행 일정 추천 엔진 — FastAPI + LangGraph"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+requires-python = ">=3.12"
+authors = [{ name = "The MAP Contributors" }]
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["map_project_agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
