@@ -41,6 +41,7 @@ map-project-agent 는 여행 일정 추천 엔진이다. BFF(map-project-user)�
 
 - 기본은 합성 제공자(`AGENT_LLM_PROVIDER=fake`, `map_project_agent/llm/fake_client.py`)다. 프롬프트의 데이터 태그만 읽어 후보 앞에서부터 하루 세 곳씩 고르고, 이유·옷차림·요약은 틀 문장으로 채운다. 같은 입력이면 같은 결과이며 문장마다 `[합성]` 이 붙는다. 외부 호출·비용이 없다.
 - `AGENT_LLM_PROVIDER=gemini` 로 고르고 `MAP_PROJECT_GEMINI_API_KEY` 를 넣었을 때만 Gemini 를 부른다. 이때만 키를 검사하고 호출 한도기를 띄운다.
+- 합성 제공자일 때는 hub 시험 모드의 스텁 후보(content_id 에 `stub`)도 장소로 받는다. 빠른 시작이 외부 키 없이 끝까지 돌게 하기 위해서다. Gemini 제공자에서는 스텁 후보를 받지 않는다.
 - 모든 LLM 호출은 `call_structured` 한 관문을 지난다(장소 선정·추천 이유·후기 요약 세 곳).
 
 ## 외부 의존성
