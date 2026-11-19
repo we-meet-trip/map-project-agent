@@ -646,7 +646,7 @@ class GeminiClient:
 
         # Gemini 2.5 thinking 토큰은 max_output_tokens 를 함께 소비한다.
         # 구조화 JSON 추출에는 thinking 이 불필요하고, 켜두면 출력 공간을
-        # 잠식해 JSON 절단(EOF ValidationError)을 유발한다(E2E 실측).
+        # 잠식해 JSON 절단(EOF ValidationError)을 유발한다.
         # budget 음수면 미설정(모델 기본)으로 둔다.
         config_kwargs = dict(
             response_mime_type="application/json",

@@ -2,8 +2,8 @@
 
 실제 Redis 대신 limiter._script 를 스크립트된 대역으로 교체하고,
 app.llm.rate_limit._sleep 을 계측용 페이크로 바꿔 대기 시간을 검증한다.
-(Lua 스크립트 자체의 Redis 통합 동작은 단계 15 의 docker compose 수동
-검증 항목이다.)
+(Lua 스크립트 자체의 Redis 통합 동작은 docker compose 로 띄운 Redis 에서
+따로 확인한다.)
 """
 from __future__ import annotations
 

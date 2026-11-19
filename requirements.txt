@@ -4,7 +4,7 @@
 # fastapi
 #   - app/main.py 에서 `FastAPI(...)` 인스턴스, `@app.get("/health")`, `@app.post("/v1/recommend")` 라우터 정의에 사용.
 fastapi==0.141.1
-# Explicit security pin: excludes CVE-2026-48818 / CVE-2026-54283.
+# 보안 수정이 들어간 판으로 명시 고정한다.
 starlette==1.6.0
 # uvicorn[standard]
 #   - Dockerfile ENTRYPOINT 의 ASGI 서버. app.main:app 을 호스팅한다.
@@ -28,7 +28,7 @@ langgraph==1.2.0
 #   - langgraph 가 내부적으로 요구하는 코어 타입/유틸 의존성.
 langchain-core==1.4.0
 # langgraph-checkpoint-postgres
-#   - 영속 체크포인터용. 현재 코드에서는 직접 import 하지 않지만 LangGraph 영속화 옵션을 위해 설치.
+#   - 영속 체크포인터. app/main.py(런타임 저장)와 app/checkpoint_migrate.py(마이그레이션)가 직접 쓴다.
 langgraph-checkpoint-postgres==3.1.0
 # langgraph-checkpoint
 #   - langgraph 가 끌어오는 내부 의존이지만, app/main.py 가 체크포인트를 봉하는

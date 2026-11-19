@@ -1,4 +1,4 @@
-"""B2 계약 확장(schedule_id/stage/exclude) + exclude 필터 테스트."""
+"""BFF↔에이전트 요청 확장(schedule_id/stage/exclude) + exclude 필터 테스트."""
 from __future__ import annotations
 
 import asyncio

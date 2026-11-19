@@ -49,17 +49,15 @@ class AgentSettings(BaseSettings):
                       0 = thinking 끔(구조화 JSON 추출의 신뢰성·속도·비용에
                       최적, 기본값). 양수 = 해당 토큰까지 thinking 허용.
                       음수(-1) = ThinkingConfig 미설정(모델 기본, thinking
-                      미지원 모델 호환용). E2E 실측(2026-07-05): 기본
-                      thinking 이 최대 ~7000 토큰을 써 4096 상한에서 5회 중
-                      2회 JSON 절단 → budget=0 에서 5/5 성공.
+                      미지원 모델 호환용). 기본 thinking 은 최대 약 7000
+                      토큰을 써서 4096 상한에서 JSON 이 잘렸다 → 0 으로 둔다.
 
     Gemini 전송 재시도(503/500 완화) 관련:
       GEMINI_RETRY_ATTEMPTS: SDK 전송 재시도의 총 시도 수(초기 호출 포함).
                       google-genai 의 HttpRetryOptions.attempts 로 전달된다.
-                      1 이하이면 재시도 비활성(오늘 동작). E2E 실측
-                      (2026-07-05): 무료 티어에서 503 "high demand" 가
-                      빈발하고 재시도가 없어 recommend_places/route 가
-                      잡 전체를 하드실패시켰다. 이 계층은 전송 오류만
+                      1 이하이면 재시도 비활성. 무료 티어에서 503
+                      "high demand" 가 잦은데, 재시도가 없으면
+                      recommend_places/route 가 잡 전체를 실패시킨다. 이 계층은 전송 오류만
                       재시도하며 state 예산(≤3)·GeminiRateLimiter 회계와
                       무관하다.
       GEMINI_RETRY_INITIAL_DELAY: 지수 백오프 초기 지연(초). 0 이면 SDK 기본.
@@ -183,7 +181,7 @@ class AgentSettings(BaseSettings):
     잡 타이밍:
       JOB_TIMEOUT_SECONDS: 잡 1건의 전체 실행 한도. `_run_job` 의
                            `asyncio.wait_for(..., timeout=...)` 에 사용.
-                           산식(재시도 반영, 2026-07-06): LLM ≤3콜 ×
+                           산식(재시도 반영): LLM ≤3콜 ×
                            (rate-limit 대기 최대 60s + 생성 wait_for 최대
                            GEMINI_TIMEOUT_SECONDS=100s) 는 이론최악이나,
                            본 wall-clock 캡이 잡 전체를 300s 에서 강제

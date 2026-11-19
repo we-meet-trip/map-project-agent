@@ -11,7 +11,7 @@ from app.agent_settings import AgentSettings
 
 
 def test_defaults() -> None:
-    """환경 변수 미주입 시 기본값 — SoT 결정값과 일치해야 한다."""
+    """환경 변수 미주입 시 기본값 — 문서화한 기본값과 일치해야 한다."""
     s = AgentSettings(_env_file=None)
     assert s.GEMINI_RPM_LIMIT == 10
     assert s.GEMINI_RPD_LIMIT == 250

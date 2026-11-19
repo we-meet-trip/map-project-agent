@@ -1351,7 +1351,7 @@ async def score_and_rank(state: AgentState) -> AgentState:
         if settings.PERSONALIZATION_ENABLED
         else None
     )
-    # 요청에는 성향이 실리지 않는다(B2 계약을 바꾸지 않기로 했다). 지금은
+    # 요청에는 성향이 실리지 않는다(BFF↔에이전트 요청 계약을 바꾸지 않기로 했다). 지금은
     # 묶음을 모르므로 "모름" 칸을 본다 — 자료가 쌓이면 그 칸에도 값이 생긴다.
     segment = (
         _segment_for(None, None)
@@ -1922,7 +1922,7 @@ async def llm_reason(state: AgentState) -> AgentState:
 
     본 노드는 **enhancement** 다: 어떤 실패(예산 소진·타임아웃·쿼터·
     스키마 검증 실패)도 잡을 죽이지 않고 degrade(생략) 한다 — 사유는
-    `state["degraded_reason"]` 에 기록해 관측한다(사용자 결정 2026-07-05).
+    `state["degraded_reason"]` 에 기록해 관측한다.
 
     semantic 검증:
       - reasons 의 place_id 는 places 의 id 집합 부분집합이어야 하며

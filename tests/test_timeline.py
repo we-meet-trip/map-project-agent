@@ -319,7 +319,7 @@ def test_plan_strategy_matches_weather_by_date_not_position() -> None:
     """
     from app.nodes.agent_nodes import plan_strategy
 
-    # 여행은 2026-07-06 부터 3일. 그런데 hub 가 앞 이틀을 못 주고
+    # 여행은 첫째 날부터 3일. 그런데 hub 가 앞 이틀을 못 주고
     # 사흘째와 그 뒤 날짜만 보냈다.
     out = asyncio.run(plan_strategy({
         "job_id": "j",

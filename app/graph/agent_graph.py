@@ -146,8 +146,8 @@ def build_graph(checkpointer=None):
         },
     )
     # search_places 는 실패해도 error 를 세우지 않고 저하 표시로 폴백하고,
-    # rules_filter / score_and_rank 는 no-op 자리 노드라 error 를 만들지
-    # 않으므로 단순 엣지로 recommend_places 까지 직진한다.
+    # rules_filter / score_and_rank 는 hub 호출이 실패해도 저하로 흡수해
+    # error 를 만들지 않으므로 단순 엣지로 recommend_places 까지 직진한다.
     graph.add_edge("search_places", "rules_filter")
     graph.add_edge("rules_filter", "score_and_rank")
     graph.add_edge("score_and_rank", "recommend_places")

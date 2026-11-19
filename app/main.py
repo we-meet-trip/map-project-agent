@@ -207,8 +207,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # LangGraph Postgres 체크포인터 (schema=langgraph).
     # CHECKPOINT_ENABLED=true 인데 연결/스키마 준비가 실패하면 부팅을
-    # 중단한다(fail-fast — GEMINI_API_KEY 부재와 동일 패턴, 사용자 결정
-    # 2026-07-05). 관련 모듈은 지연 import 한다 — 로컬 단위 테스트
+    # 중단한다(fail-fast — GEMINI_API_KEY 부재와 같은 방식). 관련 모듈은
+    # 지연 import 한다 — 로컬 단위 테스트
     # 환경에는 psycopg/checkpoint-postgres 가 없을 수 있고, 테스트는
     # checkpointer=None 경로만 사용한다.
     checkpointer = None
@@ -230,9 +230,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             # 있으면 여기서 부팅을 막는다 — 평문으로 저장하는 폴백은 두지
             # 않는다. 옛 평문 기록은 표식이 없어 읽기 경로를 그대로 통과.
             serde = EncryptedSerializer(cipher=build_cipher(settings))
-            # search_path 를 langgraph 스키마로 고정해 setup() 이 public
-            # 에 테이블을 만들지 않도록 한다(AsyncPostgresSaver 는 스키마
-            # 인자를 직접 받지 않는다 — conninfo options 로 지정).
+            # search_path 를 langgraph 스키마로 고정한다(AsyncPostgresSaver 는
+            # 스키마 인자를 직접 받지 않는다 — conninfo options 로 지정).
+            # 테이블은 마이그레이션 모듈이 미리 만들고, 여기서는 검증만 한다.
             # 빌려줄 때마다 연결이 살아 있는지 먼저 확인한다.
             #
             # 확인을 걸지 않으면 풀은 이미 끊긴 연결도 그대로 내준다. 끊긴 줄은
@@ -345,7 +345,7 @@ Instrumentator().instrument(app).expose(
 
 
 def _verify_internal_token(provided: str | None) -> None:
-    """B2 인바운드 요청의 `X-Internal-Token` 을 검증한다.
+    """BFF→에이전트 인바운드 요청의 `X-Internal-Token` 을 검증한다.
 
     - `INTERNAL_SERVICE_TOKEN` 이 설정된 경우: 헤더 부재 또는 불일치 시
       401. 비교는 `hmac.compare_digest` 로 상수 시간 수행.
@@ -564,7 +564,7 @@ async def recommend(
 
     인자:
       req: 요청 본문. `AgentRequest` 스키마.
-      x_internal_token: B2 내부 서비스 인증 헤더. 토큰이
+      x_internal_token: 내부 서비스 인증 헤더. 토큰이
         설정된 배포에서 부재/불일치면 401.
 
     동작:
