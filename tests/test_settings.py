@@ -40,11 +40,11 @@ def test_defaults() -> None:
     assert s.SHUTDOWN_GRACE_SECONDS == 310.0
     assert s.HUB_TIMEOUT_SECONDS == 5.0
     assert s.AUTH_ENFORCED is False
-    assert s.REVIEWS_ENRICH_ENABLED is True
+    assert s.REVIEWS_ENRICH_ENABLED is False
     assert s.REVIEWS_MAX_PLACES == 3
     assert s.REVIEWS_DISPLAY == 5
     assert s.REVIEWS_FETCH_CAP_PER_JOB == 10
-    assert s.SUMMARY_ENABLED is True
+    assert s.SUMMARY_ENABLED is False
     # 추천 장소 상한(7곳)과 같아야 뒷순번 장소도 요약을 받는다.
     assert s.SUMMARY_MAX_PLACES == 7
     # 본 호출 1 + 형식 이탈 시 교정 재시도 1.

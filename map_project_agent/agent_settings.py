@@ -95,7 +95,7 @@ class AgentSettings(BaseSettings):
                      생략하는 기존 동작을 유지한다.
 
     리뷰 보강(hub `/v1/reviews`) 관련:
-      REVIEWS_ENRICH_ENABLED: True(기본)면 grounded 경로에서 상위 후보에
+      REVIEWS_ENRICH_ENABLED: 기본 False(opt-in). 켜면 grounded 경로에서 상위 후보에
                      블로그 리뷰 스니펫을 붙여 선정/이유 프롬프트를 보강한다.
                      리뷰 수집은 best-effort(실패해도 잡을 죽이지 않는다)이며
                      LLM 호출을 추가하지 않는다(hub HTTP 만 추가).
@@ -112,7 +112,7 @@ class AgentSettings(BaseSettings):
                      이어지지 않는다.
 
     블로그 요약 파이프라인 관련:
-      SUMMARY_ENABLED: True(기본)면 요약 엔드포인트가 파이프라인을 돌려
+      SUMMARY_ENABLED: 기본 False(opt-in). 켜면 요약 엔드포인트가 파이프라인을 돌려
                      장소별 요약 2줄(bullets)을 만든다. False 면 파이프라인을
                      부르지 않고 빈 결과를 돌려준다(kill-switch — 쿼터
                      압박·품질 회귀 시 즉시 무력화). 빈 요약은 호출 측이
@@ -231,14 +231,14 @@ class AgentSettings(BaseSettings):
     LOCATION_WIRE_KEY: SecretStr = SecretStr("")
     AUTH_ENFORCED: bool = False
 
-    REVIEWS_ENRICH_ENABLED: bool = True
+    REVIEWS_ENRICH_ENABLED: bool = False
     REVIEWS_MAX_PLACES: int = 3
     REVIEWS_DISPLAY: int = 5  # hub 가 받는 상한은 10
     # 선정 단계는 상위 후보(REVIEWS_MAX_PLACES)만 조회하므로 실제 소비는 이
     # 값에 한참 못 미친다. 장소 수에 비례해 호출이 늘어나지 않게 막는 안전망.
     REVIEWS_FETCH_CAP_PER_JOB: int = 10
 
-    SUMMARY_ENABLED: bool = True
+    SUMMARY_ENABLED: bool = False
     # 한 요청에 담을 장소 수 상한. 요청 스키마의 상한과 같은 값으로 두되,
     # 배포 없이 낮출 수 있도록 설정으로 분리해 둔다.
     SUMMARY_MAX_PLACES: int = 7

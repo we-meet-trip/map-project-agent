@@ -278,8 +278,11 @@ def test_prompt_view_uses_only_first_two_snippets() -> None:
 
 # ── recommend_places 통합(리뷰 상태 저장 + 예산 불변) ───────────
 
-def test_recommend_places_populates_reviews_state() -> None:
-    """grounded 선정 경로가 state["reviews"] 를 채운다(원문 보존)."""
+def test_recommend_places_populates_reviews_state(monkeypatch) -> None:
+    """후기 보강을 켜면 grounded 선정 경로가 state["reviews"] 를 채운다(원문 보존)."""
+    from map_project_agent.agent_settings import get_settings
+
+    monkeypatch.setattr(get_settings(), "REVIEWS_ENRICH_ENABLED", True)
     cands = [_candidate(0), _candidate(1)]
     # 노드 경유 호출은 검색어에 요청 지역이 붙는다.
     hub = _ReviewHub(per_query={
