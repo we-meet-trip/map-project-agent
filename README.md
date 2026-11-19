@@ -83,10 +83,10 @@ curl http://127.0.0.1:8000/health        # {"status":"ok","service":"agent"}
 | 묶음 | 대표 설정 | 기본 |
 |---|---|---|
 | LLM 제공자 | `AGENT_LLM_PROVIDER`(`fake`·`gemini`), `MAP_PROJECT_GEMINI_API_KEY`, `MAP_PROJECT_GEMINI_MODEL` | 합성(fake) |
-| 연결 | `MAP_PROJECT_HUB_BASE_URL`, `MAP_PROJECT_REDIS_URL`(DB 번호를 붙이지 않는다), `MAP_PROJECT_REDIS_DB_STREAMS` | `http://hub:8000`, DB2 |
+| 연결 | `MAP_PROJECT_HUB_BASE_URL`, `MAP_PROJECT_REDIS_URL`(DB 번호를 붙이지 않는다), `MAP_PROJECT_REDIS_DB_STREAMS` | `http://hub:8000`(map-project-infra 의 통합 실행은 내부 창구 `http://proxy:8081/hub` 를 넣는다), DB2 |
 | 보안 | `MAP_PROJECT_LOCATION_WIRE_KEY`(필수), `MAP_PROJECT_INTERNAL_SERVICE_TOKEN`, `AGENT_AUTH_ENFORCED` | 인증 강제 꺼짐(로컬용) |
 | 체크포인터 | `AGENT_CHECKPOINT_ENABLED`, `AGENT_DATABASE_USER`, `AGENT_CHECKPOINT_ENC_KEYS` | 꺼짐 |
-| 외부 본문·기록 전송 | `AGENT_REVIEWS_ENRICH_ENABLED`, `AGENT_SUMMARY_ENABLED`, `AGENT_LANGSMITH_TRACING` | 모두 꺼짐 |
+| 외부 본문·기록 전송 | `AGENT_REVIEWS_ENRICH_ENABLED`, `AGENT_SUMMARY_ENABLED`, `AGENT_LANGSMITH_TRACING`(+`AGENT_LANGSMITH_API_KEY`·`_PROJECT`·`_ENDPOINT`) | 모두 꺼짐 |
 | 학습 수집 | `MAP_PROJECT_TRAINING_CAPTURE_ENABLED` | 꺼짐 |
 
 체크포인터를 켜는 순서(역할 SQL → 마이그레이션 → 역할 SQL 재적용)는 [docs/architecture.md](docs/architecture.md#체크포인트-데이터베이스와-역할) 에 있다.
